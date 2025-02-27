@@ -91,11 +91,17 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # Compiled files
+.terraform/
 *.tfstate
 *.tfstate.backup
+*.tfstate.*.backup
+*.tfvars
+crash.log
+override.tf
+override.tf.json
+*.tfplan
+*.lock.hcl
 .terraform.tfstate.lock.info
-# Module directory
-.terraform/
 
 **/.env
 docker/.env
