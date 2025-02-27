@@ -15,7 +15,7 @@ COPY package.json .
 COPY apps/web ./apps/web
 COPY libs ./libs
 COPY packages ./packages
-COPY enterprise ./enterprise
+# COPY enterprise ./enterprise
 COPY tsconfig.json .
 
 COPY nx.json .
@@ -50,3 +50,4 @@ COPY --chown=1000:1000 --from=builder /usr/src/app/apps/web/package.json /app/pa
 RUN pnpm run envsetup:docker
 CMD [ "pnpm", "start:static:build" ]
 # end production stage
+EXPOSE 4200
