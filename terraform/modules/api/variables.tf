@@ -102,3 +102,8 @@ variable "vpc_connector" {
   description = "The id of the serverless VPC Access connector"
   type        = string
 }
+
+variable "vpc_network" {
+  description = "The name of the VPC network"
+  type        = string
+}

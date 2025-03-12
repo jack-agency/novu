@@ -153,6 +153,7 @@ module "api" {
   novu_secret_key               = module.secrets.novu_secret_key
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector                 = var.vpc_connector
+  vpc_network                   = var.vpc_network
 }
 
 ## Web

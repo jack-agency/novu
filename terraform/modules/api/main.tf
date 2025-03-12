@@ -145,3 +145,19 @@ resource "google_cloud_run_v2_service" "novu_api" {
 
   depends_on = [var.novu_cloudrun_service_account, var.mongodb_url, var.redis_url]
 }
+
+resource "google_compute_router" "novu-router" {
+  name    = "novu-router"
+  project = var.project_id
+  region  = var.region
+  network = var.vpc_network
+}
+
+resource "google_compute_router_nat" "novu-nat" {
+  name                               = "nat"
+  project                            = var.project_id
+  region                             = var.region
+  router                             = google_compute_router.novu-router.name
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  nat_ip_allocate_option             = "AUTO_ONLY"
+}
