@@ -76,7 +76,7 @@ export const createFooterLogoWithTextStacked: (props: { track: ReturnType<typeof
             {
               type: 'image',
               attrs: {
-                src: '/images/email-editor/logo.png',
+                src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/logo.png',
                 alt: null,
                 title: null,
                 width: '42',
@@ -141,7 +141,7 @@ export const createFooterLogoTextAndSocials: (props: { track: ReturnType<typeof 
             {
               type: 'image',
               attrs: {
-                src: '/images/email-editor/logo.png',
+                src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/logo.png',
                 alt: null,
                 title: null,
                 width: 48,

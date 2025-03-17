@@ -37,7 +37,7 @@ export const createHeaderCenteredLogoWithBorder: (props: { track: ReturnType<typ
             {
               type: 'image',
               attrs: {
-                src: '/images/email-editor/logo.png',
+                src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/logo.png',
                 alt: null,
                 title: null,
                 width: '48',
@@ -98,7 +98,7 @@ export const createHeaderLogoWithText: (props: { track: ReturnType<typeof useTel
                     {
                       type: 'image',
                       attrs: {
-                        src: '/images/email-editor/logo.png',
+                        src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/logo.png',
                         alt: null,
                         title: null,
                         width: '32',
@@ -178,7 +178,7 @@ export const createHeaderLogoWithCoverImage: (props: { track: ReturnType<typeof 
             {
               type: 'image',
               attrs: {
-                src: '/images/email-editor/header-hero-image.png',
+                src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/header-hero-image.png',
                 alt: null,
                 title: null,
                 width: 600,
@@ -204,7 +204,7 @@ export const createHeaderLogoWithCoverImage: (props: { track: ReturnType<typeof 
                     {
                       type: 'image',
                       attrs: {
-                        src: '/images/email-editor/logo.png',
+                        src: 'https://prod-novu-app-bucket.s3.us-east-1.amazonaws.com/assets/email-editor/logo.png',
                         alt: null,
                         title: null,
                         width: '48',
