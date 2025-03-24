@@ -17,6 +17,9 @@
   },
   "extends": "@nx/workspace/presets/npm.json",
   "release": {
+    "version": {
+      "skipLockFileUpdate": true
+    },
     "changelog": {
       "workspaceChangelog": false,
       "projectChangelogs": true
