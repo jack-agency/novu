@@ -31,11 +31,7 @@ const baseTheme = (options: { multiline?: boolean }) =>
       backgroundColor: 'transparent',
     },
     ...(options.multiline
-      ? {
-          '.cm-scroller': {
-            maxHeight: '1rem',
-          },
-        }
+      ? {}
       : {
           '.cm-scroller': {
             overflow: 'hidden',
