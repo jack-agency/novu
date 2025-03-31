@@ -1,5 +1,7 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { HttpRequestHeaderKeysEnum } from '@novu/application-generic';
+
+const ALLOWED_ORIGINS_REGEX = new RegExp(process.env.FRONT_BASE_URL);
 
 export const corsOptionsDelegate: Parameters<INestApplication['enableCors']>[0] = function (req: Request, callback) {
   const corsOptions: Parameters<typeof callback>[1] = {
@@ -16,8 +18,10 @@ export const corsOptionsDelegate: Parameters<INestApplication['enableCors']>[0] 
     corsOptions.origin = [];
 
     const requestOrigin = origin(req);
-    const isAllowedOrigin = new RegExp(process.env.FRONT_BASE_URL).test(requestOrigin);
-    if (isAllowedOrigin) {
+
+    Logger.log('[CORS Middleware]', ALLOWED_ORIGINS_REGEX, requestOrigin, ALLOWED_ORIGINS_REGEX.test(requestOrigin));
+
+    if (ALLOWED_ORIGINS_REGEX.test(requestOrigin)) {
       corsOptions.origin.push(requestOrigin);
     }
     if (process.env.WIDGET_BASE_URL) {
