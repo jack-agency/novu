@@ -19,7 +19,9 @@ export const corsOptionsDelegate: Parameters<INestApplication['enableCors']>[0] 
 
     const requestOrigin = origin(req);
 
-    Logger.log('[CORS Middleware]', ALLOWED_ORIGINS_REGEX, requestOrigin, ALLOWED_ORIGINS_REGEX.test(requestOrigin));
+    Logger.log(
+      `[CORS Middleware] ${ALLOWED_ORIGINS_REGEX}, ${requestOrigin}, ${ALLOWED_ORIGINS_REGEX.test(requestOrigin)}`
+    );
 
     if (ALLOWED_ORIGINS_REGEX.test(requestOrigin)) {
       corsOptions.origin.push(requestOrigin);
