@@ -77,7 +77,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
           <InAppTabsSection className="px-4 pb-0 pt-3">
             <div className="flex items-center gap-2.5 text-sm">
               <RiInstanceLine className="size-4" />
-              <span>Advanced controls</span>
+              <span>Developers</span>
               <Badge color="orange" size="sm" variant="lighter">
                 New
               </Badge>
