@@ -18,8 +18,6 @@ const disableOutputSanitizationKey = 'disableOutputSanitization';
 const dataObjectKey = 'data';
 
 export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
-  const isDataObjectEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_DATA_OBJECT_ENABLED);
-
   if (uiSchema.group !== UiSchemaGroupEnum.IN_APP) {
     return null;
   }
@@ -71,7 +69,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
         </InAppTabsSection>
       )}
 
-      {dataObject && isDataObjectEnabled && (
+      {dataObject && (
         <>
           <Separator />
           <InAppTabsSection className="px-4 pb-0 pt-3">
@@ -86,7 +84,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
         </>
       )}
 
-      {dataObject && isDataObjectEnabled && (
+      {dataObject && (
         <>
           <InAppTabsSection className="pb-0 pt-3">
             {getComponentByType({
