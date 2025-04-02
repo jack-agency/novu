@@ -31,7 +31,6 @@
           "@novu/inbound-mail",
           "@novu/web",
           "@novu/webhook",
-          "@novu/widget",
           "@novu/worker",
           "@novu/ws"
         ],
