@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { OrganizationRepository } from '@novu/dal';
-import { GetVercelConfigurationCommand } from './get-vercel-configuration.command';
+
+import { GetVercelIntegrationCommand } from './get-vercel-integration.command';
 
 @Injectable()
-export class GetVercelConfiguration {
+export class GetVercelIntegration {
   constructor(private organizationRepository: OrganizationRepository) {}
 
-  async execute(command: GetVercelConfigurationCommand) {
+  async execute(command: GetVercelIntegrationCommand) {
     return await this.getConfigurationDetails(command);
   }
 
-  private async getConfigurationDetails(command: GetVercelConfigurationCommand) {
-    const details = await this.organizationRepository.findPartnerConfigurationDetails(
-      command.organizationId,
-      command.userId,
-      command.configurationId
-    );
+  private async getConfigurationDetails(command: GetVercelIntegrationCommand) {
+    const details = await this.organizationRepository.findByPartnerConfigurationId({
+      userId: command.userId,
+      configurationId: command.configurationId,
+    });
 
     return details.reduce(
       (acc, curr) => {

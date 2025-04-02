@@ -1,33 +1,40 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
-import { OrganizationRepository, PartnerTypeEnum, IPartnerConfiguration } from '@novu/dal';
+import { OrganizationRepository, PartnerTypeEnum } from '@novu/dal';
+import { AnalyticsService } from '@novu/application-generic';
+
 import { ApiException } from '../../../shared/exceptions/api.exception';
-import { SetupVercelConfigurationResponseDto } from '../../dtos/setup-vercel-integration-response.dto';
-import { SetVercelConfigurationCommand } from './set-vercel-configuration.command';
+import { CreateVercelIntegrationResponseDto } from '../../dtos/create-vercel-integration-response.dto';
+import { CreateVercelIntegrationCommand } from './create-vercel-integration.command';
 
 @Injectable()
-export class SetVercelConfiguration {
+export class CreateVercelIntegration {
   constructor(
     private httpService: HttpService,
-
-    private organizationRepository: OrganizationRepository
+    private organizationRepository: OrganizationRepository,
+    private analyticsService: AnalyticsService
   ) {}
 
-  async execute(command: SetVercelConfigurationCommand): Promise<SetupVercelConfigurationResponseDto> {
+  async execute(command: CreateVercelIntegrationCommand): Promise<CreateVercelIntegrationResponseDto> {
     try {
       const tokenData = await this.getVercelToken(command.vercelIntegrationCode);
 
-      if (!tokenData) throw new ApiException('No token data found');
-
-      const saveConfigurationData = {
+      const configuration = {
         accessToken: tokenData.accessToken,
         configurationId: command.configurationId,
-        teamId: tokenData.teamId as string,
+        teamId: tokenData.teamId,
         partnerType: PartnerTypeEnum.VERCEL,
       };
 
-      await this.saveConfiguration(command.organizationId, command.userId, saveConfigurationData);
+      await this.organizationRepository.upsertPartnerConfiguration({
+        organizationId: command.organizationId,
+        configuration,
+      });
+
+      this.analyticsService.track('Create Vercel Integration - [Partner Integrations]', command.userId, {
+        _organization: command.organizationId,
+      });
 
       return {
         success: true,
@@ -41,8 +48,7 @@ export class SetVercelConfiguration {
 
   private async getVercelToken(code: string): Promise<{
     accessToken: string;
-    userId: string;
-    teamId: string | null;
+    teamId: string;
   }> {
     try {
       const postData = new URLSearchParams({
@@ -64,7 +70,6 @@ export class SetVercelConfiguration {
 
       return {
         accessToken: data.access_token,
-        userId: data.user_id,
         teamId: data.team_id,
       };
     } catch (error) {
@@ -72,9 +77,5 @@ export class SetVercelConfiguration {
         error?.response?.data?.error_description || error?.response?.data?.message || error.message
       );
     }
-  }
-
-  private async saveConfiguration(organizationId: string, userId: string, configuration: IPartnerConfiguration) {
-    await this.organizationRepository.updatePartnerConfiguration(organizationId, userId, configuration);
   }
 }

@@ -44,6 +44,7 @@ import { OnboardingParentRoute } from './routes/onboarding';
 import { ROUTES } from './utils/routes';
 import { initializeSentry } from './utils/sentry';
 import { overrideZodErrorMap } from './utils/validation';
+import { VercelIntegrationPage } from './pages/vercel-integration-page';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -213,6 +214,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.INTEGRATIONS,
             element: <IntegrationsListPage />,
+          },
+          {
+            path: ROUTES.PARTNER_INTEGRATIONS_VERCEL,
+            element: <VercelIntegrationPage />,
           },
           {
             path: ROUTES.SETTINGS,
