@@ -15,10 +15,7 @@ type VariableSelectProps = HTMLAttributes<HTMLDivElement> & {
   title?: string;
   placeholder?: string;
   error?: string;
-  emptyStateMessage?: {
-    primary: string;
-    secondary: string;
-  };
+  emptyState?: React.ReactNode;
 };
 
 /**
@@ -43,7 +40,7 @@ export const VariableSelect = (props: VariableSelectProps) => {
     title = 'Variables',
     error,
     placeholder,
-    emptyStateMessage,
+    emptyState,
     ...rest
   } = props;
   const [inputValue, setInputValue] = useState(value ?? '');
@@ -160,9 +157,9 @@ export const VariableSelect = (props: VariableSelectProps) => {
         </PopoverContent>
       )}
 
-      {filteredOptions.length === 0 && !inputValue && (
+      {filteredOptions.length === 0 && !inputValue && emptyState && (
         <PopoverContent
-          className="min-w-[250px] max-w-[250px] p-0"
+          className="max-w-[250px] p-1"
           side="bottom"
           align="start"
           onOpenAutoFocus={(e) => {
@@ -171,13 +168,7 @@ export const VariableSelect = (props: VariableSelectProps) => {
           }}
           onFocusOutside={onClose}
         >
-          <div className="flex flex-col items-center justify-center p-4 text-center">
-            <p className="text-foreground-600 text-sm">{emptyStateMessage?.primary ?? 'Refine the key'}</p>
-            <p className="text-foreground-400 mt-1 text-xs">
-              {emptyStateMessage?.secondary ??
-                'Type "payload." to specify a payload variable to refine the key further'}
-            </p>
-          </div>
+          {emptyState}
         </PopoverContent>
       )}
     </Popover>
