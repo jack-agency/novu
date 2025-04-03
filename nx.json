@@ -44,9 +44,7 @@
       "packages": {
         "projects": [
           "novu",
-          "@novu/client",
           "@novu/framework",
-          "@novu/headless",
           "@novu/js",
           "@novu/react",
           "@novu/react-native",
