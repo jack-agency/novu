@@ -31,6 +31,7 @@ export const InAppSubject = () => {
                 onChange={field.onChange}
                 variables={variables}
                 isAllowedVariable={isAllowedVariable}
+                autoFocus
               />
             </InputRoot>
           </FormControl>
