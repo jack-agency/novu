@@ -1,7 +1,10 @@
+import { VariablePill } from '@/components/variable/variable-pill';
 import { createFooters } from '@/components/workflow-editor/steps/email/blocks/footers';
 import { createHeaders } from '@/components/workflow-editor/steps/email/blocks/headers';
 import { createHtmlCodeBlock } from '@/components/workflow-editor/steps/email/blocks/html';
 import { useTelemetry } from '@/hooks/use-telemetry';
+import { IsAllowedVariable } from '@/utils/parseStepVariables';
+import { searchSlashCommands } from '@maily-to/core-digest/extensions';
 import {
   BlockGroupItem,
   blockquote,
@@ -30,9 +33,8 @@ import {
   VariableExtension,
   Variables,
 } from '@maily-to/core/extensions';
-import { ReactNodeViewRenderer } from '@tiptap/react';
-import { searchSlashCommands } from '@maily-to/core-digest/extensions';
 import { StepResponseDto } from '@novu/shared';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 import { createDigestBlock } from './blocks/digest';
 import {
   CalculateVariablesProps,
@@ -41,13 +43,14 @@ import {
   VariableFrom,
 } from './variables/variables';
 import { ForView } from './views/for-view';
-import { createVariableView } from './views/variable-view';
-import { MailyVariablesListView } from './views/maily-variables-list-view';
 import { HTMLCodeBlockView } from './views/html-view';
-import { VariablePill } from '@/components/variable/variable-pill';
-import { IsAllowedVariable } from '@/utils/parseStepVariables';
+
+import { MailyVariablesListView } from './views/maily-variables-list-view';
+import { createVariableView } from './views/variable-view';
+import { createCards } from './blocks/cards';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
+import { VariablePillOld } from '@/components/variable/variable-pill-old';
 export const VARIABLE_TRIGGER_CHARACTER = '{{';
 
 /**
@@ -84,8 +87,12 @@ export const createEditorBlocks = (props: {
 
   const highlightBlocks = [createHtmlCodeBlock({ track }), createHeaders({ track }), createFooters({ track })];
 
-  if (isEnhancedDigestEnabled && digestStepBeforeCurrent) {
-    highlightBlocks.unshift(createDigestBlock({ track, digestStepBeforeCurrent }));
+  if (isEnhancedDigestEnabled) {
+    highlightBlocks.unshift(createCards({ track }));
+
+    if (digestStepBeforeCurrent) {
+      highlightBlocks.unshift(createDigestBlock({ track, digestStepBeforeCurrent }));
+    }
   }
 
   blocks.push({
@@ -207,12 +214,14 @@ export const createExtensions = (props: {
       },
       // variable pills in bubble menus (repeat, showIf...)
       renderVariable: (opts) => {
-        return (
-          <VariablePill
+        return isEnhancedDigestEnabled ? (
+          <VariablePill variableName={opts.variable.name} className="h-5 text-xs" from={opts.from as VariableFrom} />
+        ) : (
+          <VariablePillOld
             variableName={opts.variable.name}
-            hasFilters={false}
             className="h-5 text-xs"
             from={opts.from as VariableFrom}
+            hasFilters={false}
           />
         );
       },
