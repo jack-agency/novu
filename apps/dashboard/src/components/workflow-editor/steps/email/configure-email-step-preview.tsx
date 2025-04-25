@@ -24,7 +24,7 @@ const MiniEmailPreview = (props: MiniEmailPreviewProps) => {
       <div className="flex flex-col gap-1 py-1">
         <EmailPreviewHeader className="px-2 text-sm" />
         <Separator className="before:bg-neutral-alpha-100" />
-        <div className="relative z-10 space-y-1 px-2">{children}</div>
+        <div className="relative z-10 line-clamp-3 space-y-1 px-2 pt-2 text-xs">{children}</div>
       </div>
     </div>
   );
@@ -85,13 +85,9 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
   if (previewData.result.type === 'email') {
     return (
       <MiniEmailPreview className={className} {...rest}>
-        <p className="text-foreground-400 line-clamp-3">
-          <span className="text-foreground-600 max-w-[20ch] truncate text-sm">
-            {previewData.result.preview.subject}
-          </span>
-          <span> - </span>
-          <span className="text-foreground-400 text-sm">{getPlainText(previewData.result.preview.body)}</span>
-        </p>
+        <span className="text-foreground-600 max-w-[20ch] truncate">{previewData.result.preview.subject}</span>
+        <span> - </span>
+        <span className="text-foreground-400">{getPlainText(previewData.result.preview.body)}</span>
       </MiniEmailPreview>
     );
   }
