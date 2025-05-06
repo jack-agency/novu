@@ -292,7 +292,6 @@ export class SendMessagePush extends SendMessageBase {
     try {
       const pushHandler = this.getIntegrationHandler(integration);
       const bridgeOutputs = command.bridgeData?.outputs;
-      const bridgeProviderData = command.bridgeData?.providers?.[integration.providerId] || {};
 
       const result = await pushHandler.send({
         target: [deviceToken],
@@ -302,7 +301,12 @@ export class SendMessagePush extends SendMessageBase {
         overrides,
         subscriber,
         step,
-        bridgeProviderData,
+        bridgeProviderData: this.combineOverrides(
+          command.bridgeData,
+          command.overrides,
+          command.step.stepId,
+          integration.providerId
+        ),
       });
 
       await this.createExecutionDetails.execute(
