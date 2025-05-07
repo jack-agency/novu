@@ -2,9 +2,7 @@ import { IsDefined, IsObject, IsOptional, IsString, ValidateIf, ValidateNested }
 import { Type } from 'class-transformer';
 import { ApiExtraModels, ApiHideProperty, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import {
-  EmailProviderIdEnum,
   ProvidersIdEnum,
-  ProvidersIdEnumConst,
   TriggerRecipientsPayload,
   TriggerRecipientsTypeEnum,
   TriggerRecipientSubscriber,
@@ -66,7 +64,7 @@ export class StepsOverrides {
 }
 
 export class TriggerOverrides {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'This could be used to override provider specific configurations',
     example: {
       'email-step': {
@@ -84,7 +82,7 @@ export class TriggerOverrides {
   })
   steps?: Record<string, StepsOverrides>;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Overrides the provider configuration for the entire workflow and all steps',
     example: {
       sendgrid: {
@@ -98,6 +96,44 @@ export class TriggerOverrides {
     },
   })
   providers?: Record<ProvidersIdEnum, Record<string, unknown>>;
+
+  @ApiPropertyOptional({
+    description: 'Override the email provider specific configurations for the entire workflow',
+    deprecated: true,
+    type: 'object',
+    additionalProperties: true,
+  })
+  email?: Record<string, any>;
+
+  @ApiPropertyOptional({
+    description: 'Override the push provider specific configurations for the entire workflow',
+    deprecated: true,
+    type: 'object',
+    additionalProperties: true,
+  })
+  push?: Record<string, any>;
+
+  @ApiPropertyOptional({
+    description: 'Override the sms provider specific configurations for the entire workflow',
+    deprecated: true,
+    type: 'object',
+    additionalProperties: true,
+  })
+  sms?: Record<string, any>;
+
+  @ApiPropertyOptional({
+    description: 'Override the chat provider specific configurations for the entire workflow',
+    deprecated: true,
+    type: 'object',
+    additionalProperties: true,
+  })
+  chat?: Record<string, any>;
+
+  @ApiPropertyOptional({
+    description: 'Override the layout identifier for the entire workflow',
+    deprecated: true,
+  })
+  layoutIdentifier?: string;
 }
 
 @ApiExtraModels(SubscriberPayloadDto, TenantPayloadDto, TopicPayloadDto, StepsOverrides)
@@ -147,10 +183,6 @@ export class TriggerEventRequestDto {
       },
     },
     type: TriggerOverrides,
-    additionalProperties: {
-      type: 'object',
-      additionalProperties: true,
-    },
     required: false,
   })
   @IsObject()
