@@ -1,4 +1,4 @@
-import { searchSlashCommands } from '@maily-to/core-digest/extensions';
+import { searchSlashCommands } from '@maily-to/core/extensions';
 import {
   BlockGroupItem,
   blockquote,
@@ -28,7 +28,7 @@ import {
   LogoAttributes as MailyLogoAttributes,
   LinkExtension,
   LinkAttributes as MailyLinkAttributes,
-} from '@maily-to/core-digest/extensions';
+} from '@maily-to/core/extensions';
 import {
   getSlashCommandSuggestions,
   getVariableSuggestions,
