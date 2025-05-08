@@ -104,10 +104,8 @@ export const InboxButton = () => {
 
   return (
     <Inbox
-      subscriberId={user.externalId ?? ''}
+      subscriber={user.externalId ?? ''}
       applicationIdentifier={appId}
-      backendUrl={API_HOSTNAME}
-      socketUrl={WEBSOCKET_HOSTNAME}
       localization={{
         'inbox.filters.labels.default': `Inbox${localizationTestSuffix}`,
         'inbox.filters.labels.unread': `Unread${localizationTestSuffix}`,
