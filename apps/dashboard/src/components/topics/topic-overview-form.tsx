@@ -166,7 +166,7 @@ export function TopicOverviewForm({ topic, readOnly = false }: TopicOverviewForm
                   </FormLabel>
                   <span className="ml-auto">
                     <Link
-                      to="https://docs.novu.co/platform/topics"
+                      to="https://docs.novu.co/platform/concepts/topics"
                       className="text-xs font-medium text-neutral-600 hover:underline"
                       target="_blank"
                     >

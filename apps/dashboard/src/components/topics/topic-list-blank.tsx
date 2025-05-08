@@ -20,7 +20,7 @@ export const TopicListBlank = () => {
       </div>
 
       <div className="flex items-center justify-center gap-6">
-        <Link to="https://docs.novu.co/platform/topics" target="_blank">
+        <Link to="https://docs.novu.co/platform/concepts/topics" target="_blank">
           <LinkButton variant="gray" trailingIcon={RiBookMarkedLine}>
             View Docs
           </LinkButton>
