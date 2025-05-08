@@ -1,5 +1,5 @@
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '@/components/primitives/popover';
-import { APP_ID } from '@/config';
+import { API_HOSTNAME, APP_ID, IS_SELF_HOSTED, WEBSOCKET_HOSTNAME } from '@/config';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTestPage } from '@/hooks/use-test-page';
 import { useUser } from '@clerk/clerk-react';
@@ -92,6 +92,10 @@ export const InboxButton = () => {
     return null;
   }
 
+  if (!isTestPage && IS_SELF_HOSTED) {
+    return null;
+  }
+
   /**
    * If the page is a test page, we use the environment identifier as the appId.
    *
@@ -104,8 +108,10 @@ export const InboxButton = () => {
 
   return (
     <Inbox
-      subscriber={user.externalId ?? ''}
+      subscriberId={user.externalId ?? ''}
       applicationIdentifier={appId}
+      backendUrl={API_HOSTNAME}
+      socketUrl={WEBSOCKET_HOSTNAME}
       localization={{
         'inbox.filters.labels.default': `Inbox${localizationTestSuffix}`,
         'inbox.filters.labels.unread': `Unread${localizationTestSuffix}`,
