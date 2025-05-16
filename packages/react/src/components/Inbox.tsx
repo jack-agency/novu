@@ -110,6 +110,7 @@ const InboxChild = withRenderer(
       appearance,
       tabs,
       preferencesFilter,
+      preferenceGroups,
       routerPush,
       applicationIdentifier,
       subscriberId,
@@ -126,6 +127,7 @@ const InboxChild = withRenderer(
         appearance,
         tabs,
         preferencesFilter,
+        preferenceGroups,
         routerPush,
         options: {
           applicationIdentifier,
@@ -141,6 +143,7 @@ const InboxChild = withRenderer(
       appearance,
       tabs,
       preferencesFilter,
+      preferenceGroups,
       applicationIdentifier,
       subscriberId,
       subscriberHash,
