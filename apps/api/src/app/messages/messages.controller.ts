@@ -76,7 +76,7 @@ export class MessagesController {
     This action is irreversible. **messageId** is required and of mongodbId type.`,
   })
   @ApiParam({ name: 'messageId', type: String, required: true, example: '507f1f77bcf86cd799439011' })
-  @RequirePermissions(PermissionsEnum.MESSAGE_DELETE)
+  @RequirePermissions(PermissionsEnum.MESSAGE_WRITE)
   async deleteMessage(
     @UserSession() user: UserSessionData,
     @Param() { messageId }: DeleteMessageParams
