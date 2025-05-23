@@ -14,6 +14,27 @@
     "@nx/eslint:lint": {
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/tools/eslint-rules/**/*"]
+    },
+    "@novu/api:build": {
+      "cache": true,
+      "outputs": [
+        "default",
+        "{projectRoot}/dist",
+        "{projectRoot}/funcs",
+        "{projectRoot}/hooks",
+        "{projectRoot}/libs",
+        "{projectRoot}/models",
+        "{projectRoot}/react-query",
+        "{projectRoot}/sdk",
+        "{projectRoot}/types",
+        "{projectRoot}/docs",
+        "{projectRoot}/index.js",
+        "{projectRoot}/core.js"
+      ]
+    },
+    "@novu/api-service:build": {
+      "cache": true,
+      "outputs": ["default", "{projectRoot}/src/metadata.ts"]
     }
   },
   "namedInputs": {
@@ -28,7 +49,7 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [{ "runtime": "node --version" }]
   },
   "release": {
     "changelog": {
