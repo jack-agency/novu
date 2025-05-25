@@ -150,7 +150,7 @@ export const createPythonSnippet = ({ identifier, to, payload, secretKey }: Code
   const renderedSecretKey = secretKey ? `'${secretKey}'` : `os.environ['${SECRET_KEY_ENV_KEY}']`;
   const euServerUrl = IS_EU ? `,\n    server_url='https://eu.api.novu.co'` : '';
   const selfHostedUrl = IS_SELF_HOSTED ? `,\n    server_url='${API_HOSTNAME}'` : '';
-  const serverUrlConfig = IS_EU ? euServerUrl : (IS_SELF_HOSTED ? selfHostedUrl : '');
+  const serverUrlConfig = IS_EU ? euServerUrl : IS_SELF_HOSTED ? selfHostedUrl : '';
 
   return `import novu_py
 from novu_py import Novu
