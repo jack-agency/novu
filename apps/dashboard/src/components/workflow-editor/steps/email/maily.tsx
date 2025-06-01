@@ -46,6 +46,15 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
 
   const parsedVariables = useParseVariables(schemaToUse, digestStepBeforeCurrent?.stepId, isPayloadSchemaEnabled);
 
+  // Create a key that changes when variables change to force extension recreation
+  const variablesKey = useMemo(() => {
+    const variableNames = [...parsedVariables.primitives, ...parsedVariables.arrays, ...parsedVariables.namespaces]
+      .map((v) => v.name)
+      .sort()
+      .join(',');
+    return `vars-${variableNames.length}-${variableNames.slice(0, 100)}`; // Truncate to avoid overly long keys
+  }, [parsedVariables.primitives, parsedVariables.arrays, parsedVariables.namespaces]);
+
   const primitives = useMemo(
     () => parsedVariables.primitives.map((v) => ({ name: v.name, required: false })),
     [parsedVariables.primitives]
@@ -165,7 +174,7 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
         {...rest}
       >
         <Editor
-          key="repeat-block-enabled"
+          key={`${variablesKey}-repeat-block-enabled`}
           config={DEFAULT_EDITOR_CONFIG}
           blocks={blocks}
           extensions={extensions}
