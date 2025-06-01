@@ -99,7 +99,13 @@ export const EditVariablePopover = ({
   const [filters, setFilters] = useState<FilterWithParam[]>(parsedFilters || []);
 
   const aliasFor = useMemo(() => calculateAliasFor(name, parsedAliasForRoot), [name, parsedAliasForRoot]);
-  const validation = useVariableValidation(name, aliasFor, isAllowedVariable, getSchemaPropertyByKey);
+  const validation = useVariableValidation(
+    name,
+    aliasFor,
+    isAllowedVariable,
+    getSchemaPropertyByKey,
+    isPayloadSchemaEnabled
+  );
 
   useEffect(() => {
     setName(parsedName);

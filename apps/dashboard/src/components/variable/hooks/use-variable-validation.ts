@@ -24,7 +24,8 @@ export const useVariableValidation = (
   variableName: string,
   aliasFor: string | null,
   isAllowedVariable: IsAllowedVariable,
-  getSchemaPropertyByKey: (keyPath: string) => JSONSchema7 | undefined
+  getSchemaPropertyByKey: (keyPath: string) => JSONSchema7 | undefined,
+  isPayloadSchemaEnabled: boolean
 ): VariableValidationState => {
   return useMemo(() => {
     if (!variableName) {
@@ -60,7 +61,7 @@ export const useVariableValidation = (
     const variableToCheck: LiquidVariable = { name: variableName, aliasFor };
     const isAllowed = isAllowedVariable(variableToCheck);
 
-    const hasError = isPayload && !isInSchema ? true : !isAllowed;
+    const hasError = isPayload && !isInSchema && isPayloadSchemaEnabled ? true : !isAllowed;
     const errorMessage = hasError ? "Variable schema doesn't exist" : '';
 
     return {
