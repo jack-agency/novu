@@ -262,7 +262,12 @@ export const createExtensions = ({
               range,
             });
           } else {
-            const isAllowed = parsedVariables.isAllowedVariable({ name: props.id });
+            // Calculate aliasFor before validation to properly handle "current." variables
+            const aliasFor = resolveRepeatBlockAlias(props.id, editor);
+            const isAllowed = parsedVariables.isAllowedVariable({
+              name: props.id,
+              aliasFor,
+            });
 
             if (!isAllowed) {
               return;
