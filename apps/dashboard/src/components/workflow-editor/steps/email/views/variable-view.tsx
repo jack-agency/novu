@@ -82,7 +82,13 @@ function InternalVariableView(props: InternalVariableViewProps) {
     };
   }, [aliasFor, fullLiquidExpression]);
 
-  const validation = useVariableValidation(name, aliasFor, isAllowedVariable, getSchemaPropertyByKey);
+  const validation = useVariableValidation(
+    name,
+    aliasFor,
+    isAllowedVariable,
+    getSchemaPropertyByKey,
+    isPayloadSchemaEnabled
+  );
 
   return (
     <NodeViewWrapper className="react-component mly-inline-block mly-leading-none" draggable="false">
