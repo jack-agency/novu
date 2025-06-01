@@ -247,13 +247,17 @@ export const createExtensions = ({
           const query = props.id + '}}';
 
           // Check if this is a new variable by seeing if it's a payload variable that doesn't exist in our schema
-          const isPayloadVariable = props.id.startsWith('payload.');
+          const isPayloadVariable = props.id.startsWith('payload.') || props.id.startsWith('current.payload.');
           const existsInSchema = parsedVariables.variables.some((v) => v.name === props.id);
           const isNewVariable =
-            isPayloadSchemaEnabled && isPayloadVariable && !existsInSchema && props.id !== 'payload';
+            isPayloadSchemaEnabled &&
+            isPayloadVariable &&
+            !existsInSchema &&
+            props.id !== 'payload' &&
+            props.id !== 'current.payload';
 
           if (isNewVariable) {
-            const variableName = props.id.replace('payload.', '');
+            const variableName = props.id.replace('current.payload.', '').replace('payload.', '');
             onCreateNewVariable?.(variableName);
 
             insertVariableToEditor({
