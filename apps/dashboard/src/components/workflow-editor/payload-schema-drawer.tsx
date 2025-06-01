@@ -13,12 +13,12 @@ import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { SchemaEditor } from '@/components/schema-editor/schema-editor';
 import { useWorkflowSchema } from './workflow-schema-provider';
-import type { WorkflowResponseDto } from '@novu/shared';
+import { FeatureFlagsKeysEnum, type WorkflowResponseDto } from '@novu/shared';
 import { ExternalLink } from '../shared/external-link';
 import { TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { TooltipProvider } from '../primitives/tooltip';
 import { Tooltip } from '../primitives/tooltip';
-import { RiFileMarkedLine, RiInformation2Line, RiAddLine, RiShieldCheckLine } from 'react-icons/ri';
+import { RiFileMarkedLine, RiInformation2Line, RiShieldCheckLine } from 'react-icons/ri';
 import { Separator } from '../primitives/separator';
 import { Link } from 'react-router-dom';
 import { SchemaChangeConfirmationModal } from './schema-change-confirmation-modal';
@@ -26,15 +26,18 @@ import { detectSchemaChanges, type SchemaChanges } from '../schema-editor/utils/
 import { checkVariableUsageInWorkflow } from '../schema-editor/utils/check-variable-usage';
 import { Switch } from '../primitives/switch';
 import { Hint, HintIcon } from '../primitives/hint';
+import { useFeatureFlag } from '../../hooks/use-feature-flag';
+import { PayloadSchemaEmptyState, PayloadImportEditor } from './payload-schema/components';
+import { useImportSchema } from './payload-schema/hooks';
 
-interface PayloadSchemaDrawerProps {
+type PayloadSchemaDrawerProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   workflow?: WorkflowResponseDto;
   isLoadingWorkflow?: boolean;
   onSave?: (schema: JSONSchema7) => void;
   highlightedPropertyKey?: string | null;
-}
+};
 
 export function PayloadSchemaDrawer({
   isOpen,
@@ -48,6 +51,7 @@ export function PayloadSchemaDrawer({
   const [originalSchema, setOriginalSchema] = useState<JSONSchema7 | undefined>();
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<SchemaChanges | null>(null);
+  const isPayloadSchemaFFEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_PAYLOAD_SCHEMA_ENABLED);
 
   const {
     currentSchema,
@@ -63,6 +67,19 @@ export function PayloadSchemaDrawer({
     validatePayload,
     setValidatePayload,
   } = useWorkflowSchema();
+
+  const {
+    isImportMode,
+    isLoadingActivity,
+    importedPayload,
+    payloadNotFound,
+    isManualImport,
+    setImportedPayload,
+    handleImportSchema,
+    handleImportFromJson,
+    handleGenerateSchema,
+    handleBackToManual,
+  } = useImportSchema(workflow, formMethods);
 
   useEffect(() => {
     if (workflow?.payloadSchema && workflow.payloadSchema !== drawerSchema) {
@@ -150,28 +167,35 @@ export function PayloadSchemaDrawer({
           <Separator />
           <SheetMain className="p-0">
             <div className="p-3">
-              <div className="mb-2 flex flex-row items-center justify-between gap-2">
-                <h3 className="text-label-xs w-full">Payload schema</h3>
-              </div>
-
-              <div className="rounded-4 border-1 mb-2 flex items-center justify-between border border-neutral-100 bg-white p-1.5">
-                <div className="text-text-strong text-label-xs flex items-center gap-1">
-                  <RiShieldCheckLine className="text-text-strong size-3" />
-                  Enforce schema validation
-                  <Tooltip>
-                    <TooltipTrigger className="flex cursor-default flex-row items-center gap-1">
-                      <RiInformation2Line className="size-3 text-neutral-400" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        When enabled, the workflow will validate incoming payloads against the defined schema and reject
-                        invalid requests during the trigger http request.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Switch checked={validatePayload} onCheckedChange={setValidatePayload} disabled={isLoadingWorkflow} />
-              </div>
+              {!isImportMode && (
+                <>
+                  <div className="mb-2 flex flex-row items-center justify-between gap-2">
+                    <h3 className="text-label-xs w-full">Payload schema</h3>
+                  </div>
+                  <div className="rounded-4 border-1 mb-2 flex items-center justify-between border border-neutral-100 bg-white p-1.5">
+                    <div className="text-text-strong text-label-xs flex items-center gap-1">
+                      <RiShieldCheckLine className="text-text-strong size-3" />
+                      Enforce schema validation
+                      <Tooltip>
+                        <TooltipTrigger className="flex cursor-default flex-row items-center gap-1">
+                          <RiInformation2Line className="size-3 text-neutral-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            When enabled, the workflow will validate incoming payloads against the defined schema and
+                            reject invalid requests during the trigger http request.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <Switch
+                      checked={validatePayload}
+                      onCheckedChange={setValidatePayload}
+                      disabled={isLoadingWorkflow}
+                    />
+                  </div>
+                </>
+              )}
 
               {isLoadingWorkflow ? (
                 <div className="flex h-full items-center justify-center">Loading workflow schema...</div>
@@ -186,8 +210,24 @@ export function PayloadSchemaDrawer({
                   methods={formMethods}
                   highlightedPropertyKey={highlightedPropertyKey}
                 />
+              ) : isImportMode ? (
+                <PayloadImportEditor
+                  isLoadingActivity={isLoadingActivity}
+                  payloadNotFound={payloadNotFound}
+                  importedPayload={importedPayload}
+                  onPayloadChange={setImportedPayload}
+                  onGenerateSchema={handleGenerateSchema}
+                  onBack={handleBackToManual}
+                  isManualImport={isManualImport}
+                />
               ) : (
-                <PayloadSchemaEmptyState onAddProperty={addProperty} />
+                <PayloadSchemaEmptyState
+                  onAddProperty={addProperty}
+                  isPayloadSchemaEnabled={isPayloadSchemaFFEnabled}
+                  hasNoSchema={!workflow?.payloadSchema}
+                  onImportSchema={handleImportSchema}
+                  onImportFromJson={handleImportFromJson}
+                />
               )}
             </div>
 
@@ -216,7 +256,7 @@ export function PayloadSchemaDrawer({
                 onClick={handleSaveWithValidation}
                 isLoading={isSaving}
                 data-test-id="save-payload-schema-btn"
-                disabled={!isSchemaValid || isSaving || isLoadingWorkflow}
+                disabled={!isSchemaValid || isSaving || isLoadingWorkflow || isImportMode}
               >
                 Save Changes
               </Button>
@@ -234,25 +274,5 @@ export function PayloadSchemaDrawer({
         />
       )}
     </>
-  );
-}
-
-function PayloadSchemaEmptyState({ onAddProperty }: { onAddProperty: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 bg-white p-4 text-center">
-      <div className="mb-6 space-y-2">
-        <h3 className="text-text-sub text-label-xs">Your schema starts here</h3>
-
-        <p className="text-text-soft text-paragraph-xs max-w-md">
-          Start building your payload schema by typing{' '}
-          <code className="rounded bg-neutral-100 px-1 py-0.5 text-xs">{'{{ }}'}</code> to add variables, or create your
-          schema first from this form.
-        </p>
-      </div>
-
-      <Button variant="secondary" mode="outline" size="2xs" leadingIcon={RiAddLine} onClick={onAddProperty}>
-        Add property
-      </Button>
-    </div>
   );
 }
