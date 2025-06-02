@@ -14,6 +14,7 @@ import type { JSONSchema7 } from '../json-schema';
 import { newProperty } from '../utils/json-helpers';
 import { PropertyTypeSelector } from './property-type-selector';
 import { SchemaPropertyRow } from '../schema-property-row';
+import { MAX_NESTING_DEPTH } from '../constants';
 
 interface ArrayItemPropertyProps {
   className?: string;
@@ -23,6 +24,7 @@ interface ArrayItemPropertyProps {
   onRemove: () => void;
   arrayItemPath: string;
   onCheckVariableUsage?: (keyName: string, parentPath: string) => VariableUsageInfo;
+  depth: number;
 }
 
 const ArrayItemProperty = memo<ArrayItemPropertyProps>(function ArrayItemProperty({
@@ -33,6 +35,7 @@ const ArrayItemProperty = memo<ArrayItemPropertyProps>(function ArrayItemPropert
   onRemove,
   arrayItemPath,
   onCheckVariableUsage,
+  depth,
 }) {
   const itemNestedItem = useWatch({
     control,
@@ -55,6 +58,7 @@ const ArrayItemProperty = memo<ArrayItemPropertyProps>(function ArrayItemPropert
       parentPath={arrayItemPath}
       variableUsageInfo={itemVariableUsageInfo}
       onCheckVariableUsage={onCheckVariableUsage}
+      depth={depth + 1}
     />
   );
 });
@@ -68,6 +72,7 @@ interface ArraySectionProps {
   indentationLevel: number;
   currentFullPath: string;
   onCheckVariableUsage?: (keyName: string, parentPath: string) => VariableUsageInfo;
+  depth: number;
 }
 
 export const ArraySection = memo<ArraySectionProps>(function ArraySection({
@@ -79,6 +84,7 @@ export const ArraySection = memo<ArraySectionProps>(function ArraySection({
   indentationLevel,
   currentFullPath,
   onCheckVariableUsage,
+  depth,
 }) {
   const itemSchemaObject = useWatch({ control, name: itemSchemaObjectPath }) as JSONSchema7 | undefined;
   const itemIsObject = itemSchemaObject?.type === 'object';
@@ -89,8 +95,10 @@ export const ArraySection = memo<ArraySectionProps>(function ArraySection({
     keyName: 'itemNestedFieldId',
   });
 
+  const isAtMaxDepth = depth >= MAX_NESTING_DEPTH;
+
   const handleAddArrayItemObjectProperty = useCallback(() => {
-    if (!itemIsObject) return;
+    if (!itemIsObject || isAtMaxDepth) return;
 
     const currentList = getValues(itemPropertiesListPath);
 
@@ -104,14 +112,12 @@ export const ArraySection = memo<ArraySectionProps>(function ArraySection({
       definition: newProperty('string'),
       isRequired: false,
     } as PropertyListItem);
-  }, [itemIsObject, getValues, setValue, itemPropertiesListPath, append]);
+  }, [itemIsObject, getValues, setValue, itemPropertiesListPath, append, isAtMaxDepth]);
 
   const arrayItemPath = `${currentFullPath}[n]`;
 
   return (
-    <div
-      className={cn('mt-2 rounded border border-dashed border-neutral-200 p-2', getMarginClassPx(indentationLevel + 1))}
-    >
+    <div className={cn('p-1', getMarginClassPx(indentationLevel + 1))}>
       <div className="mb-1 flex items-center space-x-2">
         <Label className="text-xs font-medium text-gray-700">Array Item Type:</Label>
         <PropertyTypeSelector
@@ -123,10 +129,9 @@ export const ArraySection = memo<ArraySectionProps>(function ArraySection({
       </div>
 
       {itemIsObject && (
-        <div className={cn('mt-1', getMarginClassPx(1))}>
+        <div className={cn('flex flex-col gap-1.5 pt-1.5', getMarginClassPx(1))}>
           {fields.map((itemNestedField, itemNestedIndex) => (
             <ArrayItemProperty
-              className="mt-1"
               key={itemNestedField.itemNestedFieldId}
               itemNestedIndex={itemNestedIndex}
               itemPropertiesListPath={itemPropertiesListPath}
@@ -134,18 +139,27 @@ export const ArraySection = memo<ArraySectionProps>(function ArraySection({
               onRemove={() => remove(itemNestedIndex)}
               arrayItemPath={arrayItemPath}
               onCheckVariableUsage={onCheckVariableUsage}
+              depth={depth}
             />
           ))}
-          <Button
-            size="2xs"
-            variant="secondary"
-            mode="outline"
-            onClick={handleAddArrayItemObjectProperty}
-            leadingIcon={RiAddLine}
-            className="mt-1"
-          >
-            Add Item Property
-          </Button>
+          {isAtMaxDepth && (
+            <div className="mt-1 rounded border border-red-200 bg-red-50 p-2 text-xs text-red-600">
+              Maximum nesting depth of {MAX_NESTING_DEPTH} levels reached. Cannot add more item properties.
+            </div>
+          )}
+          <div>
+            <Button
+              size="2xs"
+              variant="secondary"
+              mode="lighter"
+              onClick={handleAddArrayItemObjectProperty}
+              leadingIcon={RiAddLine}
+              className="mt-1"
+              disabled={isAtMaxDepth}
+            >
+              Add Item Property
+            </Button>
+          </div>
         </div>
       )}
     </div>

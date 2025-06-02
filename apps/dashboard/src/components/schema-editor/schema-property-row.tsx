@@ -1,13 +1,11 @@
-import { memo, useCallback, useMemo } from 'react';
-import { Controller, Path, useFieldArray, useFormContext, useWatch, type Control } from 'react-hook-form';
-import { v4 as uuidv4 } from 'uuid';
+import { memo, useMemo } from 'react';
+import { Controller, Path, useFormContext, useWatch, type Control } from 'react-hook-form';
 
 import { Checkbox } from '@/components/primitives/checkbox';
-import { Label } from '@/components/primitives/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { cn } from '@/utils/ui';
 
 import type { JSONSchema7 } from './json-schema';
-import { newProperty, ensureObject } from './utils/json-helpers';
 import { getMarginClassPx } from './utils/ui-helpers';
 import type { PropertyListItem, SchemaEditorFormValues } from './utils/validation-schema';
 import type { VariableUsageInfo } from './utils/check-variable-usage';
@@ -32,6 +30,7 @@ export interface SchemaPropertyRowProps {
   parentPath?: string;
   onCheckVariableUsage?: (keyName: string, parentPath: string) => VariableUsageInfo;
   className?: string;
+  depth?: number;
 }
 
 export const SchemaPropertyRow = memo<SchemaPropertyRowProps>(function SchemaPropertyRow(props) {
@@ -45,6 +44,7 @@ export const SchemaPropertyRow = memo<SchemaPropertyRowProps>(function SchemaPro
     parentPath = '',
     onCheckVariableUsage,
     className,
+    depth = 0,
   } = props;
 
   const { setValue, getValues } = useFormContext();
@@ -90,21 +90,24 @@ export const SchemaPropertyRow = memo<SchemaPropertyRowProps>(function SchemaPro
           <Controller
             name={paths.isRequired}
             control={control}
-            render={({ field }) => (
-              <Checkbox
-                id={`${pathPrefix}-isRequired-checkbox`}
-                checked={!!field.value}
-                onCheckedChange={field.onChange}
-                disabled={isKeyNameEmpty}
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <Checkbox
+                        id={`${pathPrefix}-isRequired-checkbox`}
+                        checked={!!field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isKeyNameEmpty}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Required property</TooltipContent>
+                </Tooltip>
+              );
+            }}
           />
-          <Label
-            htmlFor={`${pathPrefix}-isRequired-checkbox`}
-            className="select-none whitespace-nowrap text-xs text-gray-600"
-          >
-            Required
-          </Label>
         </div>
 
         <PropertyActions
@@ -129,6 +132,7 @@ export const SchemaPropertyRow = memo<SchemaPropertyRowProps>(function SchemaPro
           indentationLevel={indentationLevel}
           currentFullPath={currentFullPath}
           onCheckVariableUsage={onCheckVariableUsage}
+          depth={depth}
         />
       )}
 
@@ -142,6 +146,7 @@ export const SchemaPropertyRow = memo<SchemaPropertyRowProps>(function SchemaPro
           indentationLevel={indentationLevel}
           currentFullPath={currentFullPath}
           onCheckVariableUsage={onCheckVariableUsage}
+          depth={depth}
         />
       )}
     </div>
