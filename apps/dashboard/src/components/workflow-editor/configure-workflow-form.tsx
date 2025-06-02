@@ -455,7 +455,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
               <span className="ml-auto" />
             </Button>
           </Link>
-          {isPayloadSchemaEnabled && (
+          {isPayloadSchemaEnabled && workflow?.origin === WorkflowOriginEnum.NOVU_CLOUD && (
             <Button
               variant="secondary"
               mode="outline"
