@@ -289,6 +289,14 @@ const router = createBrowserRouter([
                 ],
               },
               {
+                path: ROUTES.EDIT_WORKFLOW_ACTIVITY,
+                element: (
+                  <ProtectedRoute permission={PermissionsEnum.WORKFLOW_READ}>
+                    <EditWorkflowPage />
+                  </ProtectedRoute>
+                ),
+              },
+              {
                 path: ROUTES.TEST_WORKFLOW,
                 element: (
                   <ProtectedRoute permission={PermissionsEnum.EVENT_WRITE}>
