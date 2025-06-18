@@ -13,6 +13,7 @@ import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useDataRef } from '@/hooks/use-data-ref';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { useParseVariables } from '@/hooks/use-parse-variables';
+import { type EnhancedLiquidVariable } from '@/utils/parseStepVariables';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { countConditions, getUniqueFieldNamespaces, getUniqueOperators } from '@/utils/conditions';
 import { TelemetryEvent } from '@/utils/telemetry';
@@ -93,12 +94,39 @@ export const EditStepConditionsForm = () => {
     [hasConditions, step]
   );
 
-  const { variables, isAllowedVariable } = useParseVariables(step?.variables, digestStepBeforeCurrent?.stepId);
+  const { variables, isAllowedVariable, enhancedVariables, namespaces } = useParseVariables(
+    step?.variables,
+    digestStepBeforeCurrent?.stepId,
+    true
+  );
 
-  const fields = variables.map((variable) => ({
-    name: variable.name,
-    label: variable.name,
-    value: variable.name,
+  const isVariableAllowedInConditions = (variable: EnhancedLiquidVariable): boolean => {
+    // Filter out top-level namespace variables (subscriber, payload, steps)
+    // Users should use specific properties within these namespaces instead
+    const isTopLevelNamespace = namespaces.some((ns) => ns.name === variable.name);
+
+    if (isTopLevelNamespace) {
+      return false;
+    }
+
+    // Filter out digest summary variables (these are processed variables with filters)
+    // We want to hide the raw digest variables that have type 'digest'
+    if (variable.type === 'digest') {
+      return false;
+    }
+
+    return true;
+  };
+
+  const filteredEnhancedVariables = enhancedVariables.filter(isVariableAllowedInConditions);
+
+  const fields = filteredEnhancedVariables.map((enhancedVariable: EnhancedLiquidVariable) => ({
+    name: enhancedVariable.name,
+    label: enhancedVariable.displayLabel || enhancedVariable.name,
+    value: enhancedVariable.name,
+    dataType: enhancedVariable.dataType,
+    inputType: enhancedVariable.inputType,
+    format: enhancedVariable.format,
   }));
 
   const form = useForm<FormQuery>({
@@ -208,6 +236,7 @@ export const EditStepConditionsForm = () => {
                 fields={fields}
                 variables={variables}
                 isAllowedVariable={isAllowedVariable}
+                enhancedVariables={filteredEnhancedVariables}
               />
             )}
           />
