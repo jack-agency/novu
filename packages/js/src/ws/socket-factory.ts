@@ -18,8 +18,10 @@ export function createSocket({
   if (
     !socketUrl ||
     socketUrl === 'wss://eu.socket.novu.co' ||
+    socketUrl === 'https://eu.ws.novu.co' ||
     socketUrl === 'wss://socket.novu.co' ||
     socketUrl === 'wss://socket.novu-staging.co' ||
+    socketUrl === 'https://dev.ws.novu.co' ||
     socketUrl === 'wss://socket-worker-local.cli-shortener.workers.dev'
   ) {
     socketType = SocketType.PARTY_SOCKET;
