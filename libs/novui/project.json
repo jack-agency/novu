@@ -1,6 +1,6 @@
 {
-  "name": "@novu/web",
-  "sourceRoot": "apps/web/src",
+  "name": "@novu/novui",
+  "sourceRoot": "libs/novui/src",
   "projectType": "library",
   "targets": {
     "build": {
