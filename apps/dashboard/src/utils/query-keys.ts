@@ -18,4 +18,6 @@ export const QueryKeys = Object.freeze({
   fetchRequestLogs: 'fetchRequestLogs',
   myOrganization: 'myOrganization',
   organizationSettings: 'organizationSettings',
+  fetchTranslations: 'fetchTranslations',
+  fetchTranslation: 'fetchTranslation',
 });
