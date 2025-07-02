@@ -19,6 +19,7 @@ export * from "./integrationscontrollerupdateintegrationbyid.js";
 export * from "./layoutscontrollercreate.js";
 export * from "./layoutscontrollerdelete.js";
 export * from "./layoutscontrollerduplicate.js";
+export * from "./layoutscontrollergeneratepreview.js";
 export * from "./layoutscontrollerget.js";
 export * from "./layoutscontrollerlist.js";
 export * from "./layoutscontrollerupdate.js";
