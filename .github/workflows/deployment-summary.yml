@@ -229,10 +229,20 @@ jobs:
       - name: Generate AI deployment summary
         id: ai-summary
         if: ${{ steps.fetch-prs.outputs.pr_count > 0 }}
+        continue-on-error: true
         uses: actions/ai-inference@v1
         with:
           system-prompt: ${{ env.SYSTEM_PROMPT }}
           prompt: ${{ env.USER_PROMPT }}
+
+      - name: Log AI summary errors
+        if: ${{ steps.fetch-prs.outputs.pr_count > 0 && steps.ai-summary.outcome == 'failure' }}
+        run: |
+          echo "❌ AI deployment summary generation failed"
+          echo "Step outcome: ${{ steps.ai-summary.outcome }}"
+          echo "Step conclusion: ${{ steps.ai-summary.conclusion }}"
+          echo "Error details will be available in the job logs above"
+          echo "Continuing with fallback summary generation..."
 
       - name: Handle no recent PRs
         id: no-prs-message
@@ -245,9 +255,19 @@ jobs:
         if: ${{ always() }}
         run: |
           # Write the summary to a temporary file to avoid shell interpretation issues
-          cat > /tmp/summary.txt << 'SUMMARY_EOF'
+          if [[ "${{ steps.ai-summary.outcome }}" == "failure" ]]; then
+            cat > /tmp/summary.txt << 'SUMMARY_EOF'
+          ⚠️ AI deployment summary generation failed. Please check the workflow logs for details.
+
+          Found ${{ steps.fetch-prs.outputs.pr_count || 0 }} PRs merged to production in the last ${{ steps.output-variables.outputs.days_back }} days.
+
+          Manual review of recent PRs is recommended. View them at: https://github.com/${{ github.repository }}/pulls?q=is%3Apr+is%3Amerged+base%3Aprod
+          SUMMARY_EOF
+          else
+            cat > /tmp/summary.txt << 'SUMMARY_EOF'
           ${{ steps.ai-summary.outputs.response || steps.no-prs-message.outputs.summary || 'Summary generation failed. Please check the workflow logs.' }}
           SUMMARY_EOF
+          fi
 
           # Read and clean the content for Slack
           summary_text=$(cat /tmp/summary.txt)
