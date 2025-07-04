@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiCodeBlock, RiEdit2Line, RiEyeLine } from 'react-icons/ri';
+import { RiCodeBlock, RiEdit2Line, RiEyeLine, RiSettings4Line } from 'react-icons/ri';
 
 import { useLayoutEditor } from './layout-editor-provider';
 import { getControlsDefaultValues } from '@/utils/default-values';
@@ -10,10 +10,14 @@ import { PanelHeader } from '../workflow-editor/steps/layout/panel-header';
 import { LayoutPreviewContextPanel } from './layout-preview-context-panel';
 import { IssuesPanel } from '../issues-panel';
 import { Button } from '../primitives/button';
+import { LayoutEditorSettingsDrawer } from './layout-editor-settings-drawer';
+import { CompactButton } from '../primitives/button-compact';
 import { LayoutEditorFactory } from './layout-editor-factory';
 
 export const LayoutEditor = () => {
   const { layout, isLayoutPreviewLoading, isPending } = useLayoutEditor();
+  const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState(false);
+
   const defaultValues = useMemo(() => (layout ? getControlsDefaultValues(layout) : {}), [layout]);
   const values = useMemo(() => (layout?.controls.values.email ?? {}) as Record<string, unknown>, [layout]);
 
@@ -56,7 +60,17 @@ export const LayoutEditor = () => {
               <div className="flex min-h-0 flex-1 flex-col">
                 <ResizableLayout autoSaveId="step-editor-content-layout">
                   <ResizableLayout.EditorPanel>
-                    <PanelHeader icon={() => <RiEdit2Line />} title="Layout Editor" />
+                    <div className="flex items-center justify-between">
+                      <PanelHeader icon={() => <RiEdit2Line />} title="Layout Editor" className="flex-1">
+                        <CompactButton
+                          size="md"
+                          variant="ghost"
+                          icon={RiSettings4Line}
+                          onClick={() => setIsSettingsDrawerOpen(true)}
+                          className="[&>svg]:size-4"
+                        />
+                      </PanelHeader>
+                    </div>
                     <div className="flex-1 overflow-y-auto">
                       <div className="h-full p-3">
                         <LayoutEditorFactory />
@@ -100,6 +114,8 @@ export const LayoutEditor = () => {
           </ResizableLayout>
         </FormRoot>
       </Form>
+
+      <LayoutEditorSettingsDrawer isOpen={isSettingsDrawerOpen} onOpenChange={setIsSettingsDrawerOpen} />
     </div>
   );
 };
