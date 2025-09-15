@@ -163,19 +163,23 @@ resource "google_cloud_run_v2_service" "novu_api" {
 
     vpc_access {
       connector = var.vpc_connector
-      egress    = "ALL_TRAFFIC"
+      egress    = "PRIVATE_RANGES_ONLY"
     }
   }
 
   depends_on = [var.novu_cloudrun_service_account, var.mongodb_url, var.redis_url]
 }
 
+data "google_iam_policy" "public_iam_policy" {
+  binding {
+    role = "roles/run.invoker"
+    members = ["allUsers"]
+  }
+}
 
-resource "google_cloud_run_service_iam_binding" "allow_unauthenticated" {
+
+resource "google_cloud_run_v2_service_iam_policy" "allow_unauthenticated" {
   location = google_cloud_run_v2_service.novu_api.location
-  service  = google_cloud_run_v2_service.novu_api.name
-  role     = "roles/run.invoker"
-  members = [
-    "allUsers"
-  ]
+  name     = google_cloud_run_v2_service.novu_api.name
+  policy_data   = data.google_iam_policy.public_iam_policy.policy_data
 }

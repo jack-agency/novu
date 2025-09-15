@@ -171,6 +171,21 @@ variable "novu_api_container_port" {
   default     = 3000
 }
 
+
+## Bridge
+
+variable "bridge_service_name" {
+  description = "The name of the Cloud Run service"
+  type        = string
+  default     = "novu-bridge"
+}
+
+variable "bridge_image" {
+  description = "The fully qualified image URL to deploy from Artifact Registry"
+  type        = string
+  default     = "novu-bridge:latest"
+  
+}
 ## Artifact Registry
 
 variable "repository_id" {

@@ -46,12 +46,3 @@ resource "google_cloud_run_v2_service" "novu_web" {
     }
   }
 }
-
-resource "google_cloud_run_service_iam_binding" "allow_unauthenticated" {
-  location = google_cloud_run_v2_service.novu_web.location
-  service  = google_cloud_run_v2_service.novu_web.name
-  role     = "roles/run.invoker"
-  members = [
-    "allUsers"
-  ]
-}
