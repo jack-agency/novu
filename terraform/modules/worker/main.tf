@@ -1,9 +1,9 @@
-resource "google_cloud_run_v2_service" "novu_worker" {
+resource "google_cloud_run_v2_worker_pool" "novu_worker" {
   name                = var.worker_service_name
   location            = var.region
   project             = var.project_id
   deletion_protection = false
-  ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  launch_stage = "BETA"
   template {
 
     service_account = var.novu_cloudrun_service_account
@@ -24,6 +24,16 @@ resource "google_cloud_run_v2_service" "novu_worker" {
             version = "latest"
           }
         }
+      }
+
+      env {
+        name  = "API_ROOT_URL"
+        value = var.api_root_url
+      }
+
+      env {
+        name  = "LOG_LEVEL"
+        value = "debug"
       }
 
       env {
@@ -102,19 +112,9 @@ resource "google_cloud_run_v2_service" "novu_worker" {
       }
     }
 
-    containers {
-      image = "hashicorp/http-echo:0.2.3"
-      name  = "output-worker-health-proxy"
-      args  = ["-text=OK", "-listen=:${var.novu_worker_container_port}"]
-
-      ports {
-        container_port = var.novu_worker_container_port
-      }
-    }
-
     vpc_access {
-      connector = var.vpc_connector
-      egress    = "ALL_TRAFFIC"
+      # connector = var.vpc_connector # To configure when worker is deployed.
+      egress    = "PRIVATE_RANGES_ONLY"
     }
   }
 

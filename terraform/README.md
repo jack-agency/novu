@@ -168,6 +168,14 @@ Because of the current bugs on the solution deployment, there's no automatic dep
 
 ---
 
+
+---
+
+## 🐛 Bugs & Notes 2
+
+- The worker that was a cloud run service was replaced by a workerpool. But there's no support yet for vpc configuration through serverless connector for workerpool (BETA). So for now, we'll receive an error from Terraform for the worker.
+- To activate Identity Aware Proxy (IAP) or the novu dashboard, we need to do it through the console too. No Terraform support for now (Preview mode).
+
 ## 📚 References
 - [Novu Documentation](https://docs.novu.co/platform/overview)
 - [GitHub Repository](https://github.com/novuhq/novu/tree/v2.1.0)

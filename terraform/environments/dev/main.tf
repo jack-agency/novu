@@ -1,3 +1,8 @@
+## Project number id
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
 ## Components images
 
 data "google_artifact_registry_docker_image" "novu_worker" {
@@ -26,6 +31,13 @@ data "google_artifact_registry_docker_image" "novu_web" {
   repository_id = var.repository_id
   project       = var.repository_project_id
   image_name    = var.web_image
+}
+
+data "google_artifact_registry_docker_image" "novu_dashboard" {
+  location      = var.region
+  repository_id = var.repository_id
+  project       = var.repository_project_id
+  image_name    = var.dashboard_image
 }
 
 ## Redis
@@ -67,6 +79,36 @@ module "service_account" {
   source     = "../../modules/service_account"
   project_id = var.project_id
   account_id = "novu-cloudrun-sa"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.redis_host_accessor
+  id = "${module.secrets.redis_host_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.redis_password_accessor
+  id = "${module.secrets.redis_password_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.mongodb_url_accessor
+  id = "${module.secrets.mongodb_url_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.store_encryption_key_accessor
+  id = "${module.secrets.store_encryption_key_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.jwt_secret_accessor
+  id = "${module.secrets.jwt_secret_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
+}
+
+import {
+  to = google_secret_manager_secret_iam_member.novu_secret_key_accessor
+  id = "${module.secrets.novu_secret_key_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
 }
 
 resource "google_secret_manager_secret_iam_member" "redis_host_accessor" {
@@ -119,6 +161,7 @@ module "worker" {
   store_encryption_key          = module.secrets.store_encryption_key
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector                 = var.vpc_connector
+  api_root_url                  = "https://${var.api_service_name}-${data.google_project.project.number}.${var.region}.run.app"
 }
 
 ## WS
@@ -140,19 +183,21 @@ module "ws" {
 ## API
 
 module "api" {
-  source           = "../../modules/api"
-  project_id       = var.project_id
-  region           = var.region
-  api_service_name = var.api_service_name
-  api_image        = data.google_artifact_registry_docker_image.novu_api.self_link
-  mongodb_url      = module.secrets.mongodb_url
-  redis_url        = module.secrets.redis_host
-  redis_password   = module.secrets.redis_password
-  # store_encryption_key          = module.secrets.store_encryption_key
+  source                        = "../../modules/api"
+  project_id                    = var.project_id
+  region                        = var.region
+  api_service_name              = var.api_service_name
+  api_image                     = data.google_artifact_registry_docker_image.novu_api.self_link
+  mongodb_url                   = module.secrets.mongodb_url
+  redis_url                     = module.secrets.redis_host
+  redis_password                = module.secrets.redis_password
+  store_encryption_key          = module.secrets.store_encryption_key
   jwt_secret                    = module.secrets.jwt_secret
   novu_secret_key               = module.secrets.novu_secret_key
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector                 = var.vpc_connector
+  front_base_url                = "https://${var.dashboard_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+  api_root_url                  = "https://${var.api_service_name}-${data.google_project.project.number}.${var.region}.run.app"
 }
 
 ## Web
@@ -165,6 +210,128 @@ module "web" {
   web_image             = data.google_artifact_registry_docker_image.novu_web.self_link
   react_app_api_url     = module.api.api_service_url
   react_app_ws_url      = module.ws.ws_service_url
-  react_app_environment = var.node_env
+  node_env              = var.node_env
   vpc_connector         = var.vpc_connector
+}
+
+
+## Dashboard
+
+module "dashboard" {
+  source                        = "../../modules/dashboard"
+  project_id                    = var.project_id
+  region                        = var.region
+  dashboard_service_name        = var.dashboard_service_name
+  dashboard_image               = data.google_artifact_registry_docker_image.novu_dashboard.self_link
+  vite_api_hostname             = "https://${var.api_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+  vite_legacy_dashboard_url     = "https://${var.web_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+  vite_websocket_hostname       = "https://${var.ws_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+  vpc_connector                 = var.vpc_connector
+  novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
+}
+
+
+import {
+  to = module.api.google_cloud_run_v2_service.novu_api
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.api_service_name}"
+}
+
+import {
+  to = module.api.google_cloud_run_service_iam_binding.allow_unauthenticated
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.api_service_name} roles/run.invoker"
+}
+
+import {
+  to = module.dashboard.google_cloud_run_v2_service.novu_dashboard
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.dashboard_service_name}"
+}
+
+import {
+  to = module.redis.google_redis_instance.novu_redis
+  id = "projects/${var.project_id}/locations/${var.region}/instances/${var.instance_name}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.mongodb_url
+  id = "projects/${var.project_id}/secrets/${var.mongodb_url_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.mongodb_url_version
+  id = "projects/${var.project_id}/secrets/${var.mongodb_url_secret_id}/versions/latest"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.redis_host
+  id = "projects/${var.project_id}/secrets/${var.redis_host_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.redis_host_version
+  id = "projects/${var.project_id}/secrets/${var.redis_host_secret_id}/versions/latest"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.redis_password
+  id = "projects/${var.project_id}/secrets/${var.redis_password_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.redis_password_version
+  id = "projects/${var.project_id}/secrets/${var.redis_password_secret_id}/versions/latest"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.store_encryption_key
+  id = "projects/${var.project_id}/secrets/${var.store_encryption_key_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.store_encryption_key_version
+  id = "projects/${var.project_id}/secrets/${var.store_encryption_key_secret_id}/versions/latest"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.jwt_secret
+  id = "projects/${var.project_id}/secrets/${var.jwt_secret_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.jwt_secret_version
+  id = "projects/${var.project_id}/secrets/${var.jwt_secret_secret_id}/versions/latest"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret.novu_secret_key
+  id = "projects/${var.project_id}/secrets/${var.novu_secret_key_secret_id}"
+}
+
+import {
+  to = module.secrets.google_secret_manager_secret_version.novu_secret_key_version
+  id = "projects/${var.project_id}/secrets/${var.novu_secret_key_secret_id}/versions/latest"
+}
+
+import {
+  to = module.service_account.google_service_account.novu_cloudrun_sa
+  id = "projects/${var.project_id}/serviceAccounts/${var.novu_cloudrun_service_account}@${var.project_id}.iam.gserviceaccount.com"
+}
+
+import {
+  to = module.web.google_cloud_run_v2_service.novu_web
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.web_service_name}"
+}
+
+import {
+  to = module.web.google_cloud_run_service_iam_binding.allow_unauthenticated
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.web_service_name} roles/run.invoker"
+}
+
+import {
+  to = module.worker.google_cloud_run_v2_worker_pool.novu_worker
+  id = "projects/${var.project_id}/locations/${var.region}/workerPools/${var.worker_service_name}"
+}
+
+import {
+  to = module.ws.google_cloud_run_v2_service.novu_ws
+  id = "projects/${var.project_id}/locations/${var.region}/services/${var.ws_service_name}"
 }

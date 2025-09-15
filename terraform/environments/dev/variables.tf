@@ -27,7 +27,7 @@ variable "location_id" {
 variable "instance_name" {
   description = "The name of the Redis instance"
   type        = string
-  default     = "novu-redis"
+  default     = "novu-redis-instance"
 }
 
 variable "tier" {
@@ -59,13 +59,13 @@ variable "redis_port" {
 variable "worker_service_name" {
   description = "The name of the Cloud Run service"
   type        = string
-  default     = "novu-worker"
+  default     = "novu-worker-test"
 }
 
 variable "worker_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string
-  default     = "novu-worker:latest"
+  default     = "novu-worker:v2.3.0"
 }
 
 variable "novu_worker_container_port" {
@@ -83,7 +83,26 @@ variable "novu_cloudrun_service_account" {
 variable "node_env" {
   description = "The environment of the Cloud Run service"
   type        = string
-  default     = "local"
+  default     = "production"
+}
+
+## Dashboard
+variable "dashboard_service_name" {
+  description = "The name of the Cloud Run service"
+  type        = string
+  default     = "novu-dashboard"
+}
+
+variable "dashboard_image" {
+  description = "The fully qualified image URL to deploy from Artifact Registry"
+  type        = string
+  default     = "novu-dashboard:v2.3.0"
+}
+
+variable "dashboard_port" {
+  description = "The port to expose on the Cloud Run service"
+  type        = number
+  default     = 4000
 }
 
 ## Web
@@ -96,7 +115,7 @@ variable "web_service_name" {
 variable "web_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string
-  default     = "novu-web-cr:latest"
+  default     = "novu-web:v0.24.7"
 }
 
 variable "web_port" {
@@ -122,7 +141,7 @@ variable "ws_service_name" {
 variable "ws_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string
-  default     = "novu-ws-cr:latest"
+  default     = "novu-ws:v2.3.0"
 }
 
 variable "novu_ws_container_port" {
@@ -143,7 +162,7 @@ variable "api_service_name" {
 variable "api_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string
-  default     = "novu-api-cr:latest"
+  default     = "novu-api:v2.3.0"
 }
 
 variable "novu_api_container_port" {
@@ -179,7 +198,7 @@ variable "vpc_network" {
 variable "mongodb_url_secret_id" {
   description = "The name of the MongoDB connection string secret"
   type        = string
-  default     = "mongodb-url"
+  default     = "novu-mongodb-url"
 }
 
 variable "mongodb_url" {
@@ -192,6 +211,12 @@ variable "redis_url_secret_id" {
   description = "The name of the Redis connection string secret"
   type        = string
   default     = "novu-redis-url"
+}
+
+variable "redis_host_secret_id" {
+  description = "The Redis host"
+  type        = string
+  default     = "novu-redis-host"
 }
 
 variable "redis_password_secret_id" {

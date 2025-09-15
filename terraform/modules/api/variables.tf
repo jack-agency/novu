@@ -33,7 +33,18 @@ variable "novu_cloudrun_service_account" {
 variable "node_env" {
   description = "The environment of the Cloud Run service"
   type        = string
-  default     = "local"
+  default     = "production"
+}
+
+variable "front_base_url" {
+  description = "The base URL of the front application"
+  type        = string
+  
+}
+
+variable "api_root_url" {
+  description = "The root URL of the API"
+  type        = string  
 }
 
 ## MongoDB
@@ -84,11 +95,11 @@ variable "jwt_secret" {
   sensitive   = true
 }
 
-# variable "store_encryption_key" {
-#   description = "The store encryption key secret name"
-#   type        = string
-#   sensitive   = true
-# }
+variable "store_encryption_key" {
+  description = "The store encryption key secret name"
+  type        = string
+  sensitive   = true
+}
 
 variable "novu_secret_key" {
   description = "The store encryption key secret name"

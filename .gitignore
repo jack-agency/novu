@@ -93,6 +93,7 @@ fabric.properties
 # Compiled files
 *.tfstate
 *.tfstate.backup
+*.tfvars
 .terraform.tfstate.lock.info
 # Module directory
 .terraform/

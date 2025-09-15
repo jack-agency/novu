@@ -30,12 +30,6 @@ variable "react_app_api_url" {
   type        = string
 }
 
-variable "react_app_environment" {
-  description = "The environment of the React app"
-  type        = string
-  default     = "local"
-}
-
 variable "react_app_ws_url" {
   description = "The URL of the React app WS"
   type        = string
@@ -43,5 +37,10 @@ variable "react_app_ws_url" {
 
 variable "vpc_connector" {
   description = "The id of the serverless VPC Access connector"
+  type        = string
+}
+
+variable "node_env" {
+  description = "The environment of the React app"
   type        = string
 }

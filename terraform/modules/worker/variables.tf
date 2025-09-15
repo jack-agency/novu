@@ -36,6 +36,12 @@ variable "node_env" {
   default     = "local"
 }
 
+variable "api_root_url" {
+  description = "The root URL of the API"
+  type        = string  
+  
+}
+
 ## MongoDB
 
 variable "mongodb_url" {

@@ -20,11 +20,6 @@ resource "google_cloud_run_v2_service" "novu_web" {
       }
 
       env {
-        name  = "REACT_APP_ENVIRONMENT"
-        value = var.react_app_environment
-      }
-
-      env {
         name  = "REACT_APP_IS_SELF_HOSTED"
         value = "true"
       }
@@ -32,6 +27,11 @@ resource "google_cloud_run_v2_service" "novu_web" {
       env {
         name  = "REACT_APP_WS_URL"
         value = var.react_app_ws_url
+      }
+
+      env {
+        name  = "NODE_ENV"
+        value = var.node_env
       }
 
       env {
@@ -45,4 +45,13 @@ resource "google_cloud_run_v2_service" "novu_web" {
       egress    = "ALL_TRAFFIC"
     }
   }
+}
+
+resource "google_cloud_run_service_iam_binding" "allow_unauthenticated" {
+  location = google_cloud_run_v2_service.novu_web.location
+  service  = google_cloud_run_v2_service.novu_web.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers"
+  ]
 }
