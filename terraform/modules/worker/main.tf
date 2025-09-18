@@ -1,8 +1,9 @@
 resource "google_cloud_run_v2_worker_pool" "novu_worker" {
-  name                = var.worker_service_name
+  name                = var.worker_worker_pool_name
   location            = var.region
   project             = var.project_id
   deletion_protection = false
+  provider = google-beta
   launch_stage = "BETA"
   template {
 
@@ -113,7 +114,7 @@ resource "google_cloud_run_v2_worker_pool" "novu_worker" {
     }
 
     vpc_access {
-      # connector = var.vpc_connector # To configure when worker is deployed.
+      connector = var.vpc_connector # To configure when worker is deployed.
       egress    = "PRIVATE_RANGES_ONLY"
     }
   }

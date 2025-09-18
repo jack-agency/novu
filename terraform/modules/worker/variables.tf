@@ -9,7 +9,7 @@ variable "region" {
   default     = "europe-west1"
 }
 
-variable "worker_service_name" {
+variable "worker_worker_pool_name" {
   description = "The name of the Cloud Run service"
   type        = string
 }
@@ -33,7 +33,7 @@ variable "novu_cloudrun_service_account" {
 variable "node_env" {
   description = "The environment of the Cloud Run service"
   type        = string
-  default     = "local"
+  default     = "production"
 }
 
 variable "api_root_url" {

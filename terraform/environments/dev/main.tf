@@ -160,7 +160,7 @@ module "worker" {
   source                        = "../../modules/worker"
   project_id                    = var.project_id
   region                        = var.region
-  worker_service_name           = var.worker_service_name
+  worker_worker_pool_name           = var.worker_worker_pool_name
   worker_image                  = data.google_artifact_registry_docker_image.novu_worker.self_link
   mongodb_url                   = module.secrets.mongodb_url
   redis_url                     = module.secrets.redis_host
@@ -210,15 +210,15 @@ module "api" {
 ## Web
 
 module "web" {
-  source                = "../../modules/web"
-  project_id            = var.project_id
-  region                = var.region
-  web_service_name      = var.web_service_name
-  web_image             = data.google_artifact_registry_docker_image.novu_web.self_link
-  react_app_api_url     = module.api.api_service_url
-  react_app_ws_url      = module.ws.ws_service_url
-  node_env              = var.node_env
-  vpc_connector         = var.vpc_connector
+  source            = "../../modules/web"
+  project_id        = var.project_id
+  region            = var.region
+  web_service_name  = var.web_service_name
+  web_image         = data.google_artifact_registry_docker_image.novu_web.self_link
+  react_app_api_url = module.api.api_service_url
+  react_app_ws_url  = module.ws.ws_service_url
+  node_env          = var.node_env
+  vpc_connector     = var.vpc_connector
 }
 
 
@@ -238,9 +238,9 @@ module "dashboard" {
 }
 
 module "bridge" {
-  source                = "../../modules/bridge"
-  project_id            = var.project_id
-  region                = var.region
-  bridge_image          = data.google_artifact_registry_docker_image.novu_bridge.self_link
-  vpc_connector         = var.vpc_connector
+  source        = "../../modules/bridge"
+  project_id    = var.project_id
+  region        = var.region
+  bridge_image  = data.google_artifact_registry_docker_image.novu_bridge.self_link
+  vpc_connector = var.vpc_connector
 }

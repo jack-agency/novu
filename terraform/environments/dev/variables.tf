@@ -56,10 +56,10 @@ variable "redis_port" {
 }
 
 ## Worker
-variable "worker_service_name" {
+variable "worker_worker_pool_name" {
   description = "The name of the Cloud Run service"
   type        = string
-  default     = "novu-worker-test"
+  default     = "novu-worker-wp"
 }
 
 variable "worker_image" {
@@ -124,12 +124,6 @@ variable "web_port" {
   default     = 4200
 }
 
-variable "react_app_environment" {
-  description = "The environment of the React app"
-  type        = string
-  default     = "local"
-}
-
 ## WS
 
 variable "ws_service_name" {
@@ -184,7 +178,7 @@ variable "bridge_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string
   default     = "novu-bridge:latest"
-  
+
 }
 ## Artifact Registry
 
