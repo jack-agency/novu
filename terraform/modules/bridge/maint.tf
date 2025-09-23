@@ -6,7 +6,10 @@ resource "google_cloud_run_v2_service" "novu_bridge" {
   project             = var.project_id
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
+  invoker_iam_disabled = true
   template {
+
+    service_account = var.novu_cloudrun_service_account
 
     containers {
       image = var.bridge_image
@@ -16,10 +19,9 @@ resource "google_cloud_run_v2_service" "novu_bridge" {
 
       env {
         name  = "NOVU_SECRET_KEY"
-        value = null
         value_source {
           secret_key_ref {
-            secret  = "novu-secret-key"
+            secret  = var.novu_secret_key
             version = "latest"
           }
         }
@@ -44,4 +46,5 @@ resource "google_cloud_run_v2_service_iam_policy" "allow_unauthenticated" {
   location = google_cloud_run_v2_service.novu_bridge.location
   name     = google_cloud_run_v2_service.novu_bridge.name
   policy_data   = data.google_iam_policy.public_iam_policy.policy_data
+  project = var.project_id
 }

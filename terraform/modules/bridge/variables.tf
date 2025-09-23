@@ -14,6 +14,16 @@ variable "bridge_image" {
   type        = string
 }
 
+variable "novu_cloudrun_service_account" {
+  description = "The email of the Cloud Run service account"
+  type        = string  
+}
+
+variable "novu_secret_key" {
+  description = "The Novu secret key stored in Secret Manager"
+  type        = string
+}
+
 variable "vpc_connector" {
   description = "The id of the serverless VPC Access connector"
   type        = string

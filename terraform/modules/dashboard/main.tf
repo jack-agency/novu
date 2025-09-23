@@ -1,13 +1,15 @@
 ## Create the Cloud Run service for the Novu Dashboard app.
 
 resource "google_cloud_run_v2_service" "novu_dashboard" {
+  provider            = google-beta
   name                = "novu-dashboard"
   location            = var.region
   project             = var.project_id
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
   launch_stage        = "BETA"
-  # iap_enabled        = true # Not yet supported in terraform provider
+  iap_enabled         = true
+  invoker_iam_disabled = true
   template {
 
     containers {
@@ -42,4 +44,17 @@ resource "google_cloud_run_v2_service" "novu_dashboard" {
       egress    = "ALL_TRAFFIC"
     }
   }
+}
+
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
+resource "google_cloud_run_v2_service_iam_member" "iap_invoker" {
+  provider = google-beta
+  project = google_cloud_run_v2_service.novu_dashboard.project
+  location = google_cloud_run_v2_service.novu_dashboard.location
+  name = google_cloud_run_v2_service.novu_dashboard.name
+  role   = "roles/run.invoker"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-iap.iam.gserviceaccount.com"
 }

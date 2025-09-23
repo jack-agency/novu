@@ -4,6 +4,7 @@ resource "google_cloud_run_v2_service" "novu_api" {
   project             = var.project_id
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
+  invoker_iam_disabled = true
   template {
 
     service_account = var.novu_cloudrun_service_account
@@ -177,9 +178,11 @@ data "google_iam_policy" "public_iam_policy" {
   }
 }
 
-
 resource "google_cloud_run_v2_service_iam_policy" "allow_unauthenticated" {
-  location = google_cloud_run_v2_service.novu_api.location
-  name     = google_cloud_run_v2_service.novu_api.name
-  policy_data   = data.google_iam_policy.public_iam_policy.policy_data
+  location    = google_cloud_run_v2_service.novu_api.location
+  name        = google_cloud_run_v2_service.novu_api.name
+  policy_data = data.google_iam_policy.public_iam_policy.policy_data
+  project     = var.project_id
 }
+
+# Min instance 1??

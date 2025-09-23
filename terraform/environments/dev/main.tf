@@ -88,36 +88,6 @@ module "service_account" {
   account_id = "novu-cloudrun-sa"
 }
 
-import {
-  to = google_secret_manager_secret_iam_member.redis_host_accessor
-  id = "${module.secrets.redis_host_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
-import {
-  to = google_secret_manager_secret_iam_member.redis_password_accessor
-  id = "${module.secrets.redis_password_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
-import {
-  to = google_secret_manager_secret_iam_member.mongodb_url_accessor
-  id = "${module.secrets.mongodb_url_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
-import {
-  to = google_secret_manager_secret_iam_member.store_encryption_key_accessor
-  id = "${module.secrets.store_encryption_key_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
-import {
-  to = google_secret_manager_secret_iam_member.jwt_secret_accessor
-  id = "${module.secrets.jwt_secret_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
-import {
-  to = google_secret_manager_secret_iam_member.novu_secret_key_accessor
-  id = "${module.secrets.novu_secret_key_id} roles/secretmanager.secretAccessor serviceAccount:${module.service_account.novu_cloudrun_sa_email}"
-}
-
 resource "google_secret_manager_secret_iam_member" "redis_host_accessor" {
   secret_id = module.secrets.redis_host_id
   role      = "roles/secretmanager.secretAccessor"
@@ -237,10 +207,30 @@ module "dashboard" {
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
 }
 
+## Bridge
 module "bridge" {
   source        = "../../modules/bridge"
   project_id    = var.project_id
   region        = var.region
   bridge_image  = data.google_artifact_registry_docker_image.novu_bridge.self_link
   vpc_connector = var.vpc_connector
+}
+
+## MongoDB
+module "mongodb" {
+  source     = "../../modules/mongodb"
+  atlas_project_id = var.atlas_project_id
+  gcp_project_id = var.gcp_project_id
+  instance_size = var.instance_size
+  private_key = var.private_key
+  public_key  = var.public_key
+  gcp_cidr_block = var.gcp_cidr_block
+  serverless_connector_cidr_block = var.serverless_connector_cidr_block
+  gcp_vpc_name = var.gcp_vpc_name
+  db_username = var.db_username
+  db_password = var.db_password
+  environment = var.environment
+  max_instance_size = var.max_instance_size
+  atlas_cidr_block = var.atlas_cidr_block
+  atlas_region = var.atlas_region
 }
