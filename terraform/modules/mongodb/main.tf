@@ -2,16 +2,17 @@ resource "mongodbatlas_advanced_cluster" "novu_cluster" {
   project_id     = var.atlas_project_id
   name           = var.cluster_name
   cluster_type   = "REPLICASET"
-  backup_enabled = true
+  backup_enabled = (var.provider_name == "TENANT") ? null : true
 
   replication_specs = [{
     region_configs = [{
       priority      = 7
-      provider_name = "GCP"
+      provider_name = var.provider_name
+      backing_provider_name = (var.provider_name == "TENANT" && var.instance_size == "M0") ? var.backing_provider_name : null
       region_name   = var.atlas_region
       electable_specs = {
         instance_size = var.instance_size
-        node_count    = 3
+        node_count    = (var.provider_name == "TENANT") ? null : 3
       }
       # auto_scaling = {
       #   compute_enabled            = true

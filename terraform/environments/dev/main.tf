@@ -67,7 +67,7 @@ module "secrets" {
   source                         = "../../modules/secrets"
   project_id                     = var.project_id
   mongodb_url_secret_id          = "novu-mongodb-url"
-  mongodb_url                    = var.mongodb_url
+  mongodb_url                    = module.mongodb.connection_string
   redis_host_secret_id           = "novu-redis-host"
   redis_host                     = module.redis.redis_host
   redis_password_secret_id       = "novu-redis-password"
@@ -78,6 +78,8 @@ module "secrets" {
   jwt_secret                     = var.jwt_secret
   novu_secret_key_secret_id      = "novu-secret-key"
   novu_secret_key                = var.novu_secret_key
+
+  depends_on = [ module.mongodb ]
 }
 
 ## Service Account
@@ -139,6 +141,8 @@ module "worker" {
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector                 = var.vpc_connector
   api_root_url                  = "https://${var.api_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+
+  depends_on = [ module.secrets, module.service_account ]
 }
 
 ## WS
@@ -155,6 +159,8 @@ module "ws" {
   jwt_secret                    = module.secrets.jwt_secret
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector                 = var.vpc_connector
+
+  depends_on = [ module.secrets, module.service_account ]
 }
 
 ## API
@@ -175,6 +181,8 @@ module "api" {
   vpc_connector                 = var.vpc_connector
   front_base_url                = "https://${var.dashboard_service_name}-${data.google_project.project.number}.${var.region}.run.app"
   api_root_url                  = "https://${var.api_service_name}-${data.google_project.project.number}.${var.region}.run.app"
+
+  depends_on = [ module.secrets, module.service_account ]
 }
 
 ## Web
@@ -205,6 +213,8 @@ module "dashboard" {
   vite_websocket_hostname       = "https://${var.ws_service_name}-${data.google_project.project.number}.${var.region}.run.app"
   vpc_connector                 = var.vpc_connector
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
+
+  depends_on = [ module.service_account ]
 }
 
 ## Bridge
@@ -213,7 +223,11 @@ module "bridge" {
   project_id    = var.project_id
   region        = var.region
   bridge_image  = data.google_artifact_registry_docker_image.novu_bridge.self_link
+  novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector = var.vpc_connector
+  novu_secret_key = module.secrets.novu_secret_key
+
+  depends_on = [ module.service_account ]
 }
 
 ## MongoDB
@@ -222,6 +236,9 @@ module "mongodb" {
   atlas_project_id = var.atlas_project_id
   gcp_project_id = var.gcp_project_id
   instance_size = var.instance_size
+  provider_name = var.provider_name
+  network_container_id = var.network_container_id
+  backing_provider_name = var.backing_provider_name
   private_key = var.private_key
   public_key  = var.public_key
   gcp_cidr_block = var.gcp_cidr_block
@@ -230,7 +247,6 @@ module "mongodb" {
   db_username = var.db_username
   db_password = var.db_password
   environment = var.environment
-  max_instance_size = var.max_instance_size
   atlas_cidr_block = var.atlas_cidr_block
   atlas_region = var.atlas_region
 }

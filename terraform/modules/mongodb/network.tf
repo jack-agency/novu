@@ -8,7 +8,7 @@
 # Peering connection request
 resource "mongodbatlas_network_peering" "gcp_peering" {
   project_id       = var.atlas_project_id
-  container_id     = one(values(mongodbatlas_advanced_cluster.novu_cluster.replication_specs[0].container_id))
+  container_id     = one(values(mongodbatlas_advanced_cluster.novu_cluster.replication_specs[0].container_id)) != null ? one(values(mongodbatlas_advanced_cluster.novu_cluster.replication_specs[0].container_id)) : var.network_container_id
   provider_name    = "GCP"
   network_name     = var.gcp_vpc_name
   atlas_cidr_block = var.atlas_cidr_block

@@ -231,6 +231,11 @@ module "bridge" {
 }
 
 ## MongoDB
+locals {
+  # Only include backing_provider_name for M0 instances with TENANT provider
+  needs_backing_provider = var.instance_size == "M0" && var.provider_name == "TENANT"
+}
+
 module "mongodb" {
   source     = "../../modules/mongodb"
   atlas_project_id = var.atlas_project_id
@@ -239,12 +244,14 @@ module "mongodb" {
   private_key = var.private_key
   public_key  = var.public_key
   gcp_cidr_block = var.gcp_cidr_block
+  network_container_id = var.network_container_id
   serverless_connector_cidr_block = var.serverless_connector_cidr_block
   gcp_vpc_name = var.gcp_vpc_name
   db_username = var.db_username
   db_password = var.db_password
   environment = var.environment
-  max_instance_size = var.max_instance_size
   atlas_cidr_block = var.atlas_cidr_block
   atlas_region = var.atlas_region
+  backing_provider_name = local.needs_backing_provider ? "GCP" : null
+  provider_name = var.provider_name
 }

@@ -312,6 +312,12 @@ variable "atlas_cidr_block" {
   type        = string
 }
 
+variable "network_container_id" {
+  description = "ID of an existing Atlas network container (VPC) to use for peering. If not provided, a new container will be created using the provided atlas_cidr_block."
+  type        = string
+  default     = "68d14f5daf92771b0483c10a"
+}
+
 variable "gcp_cidr_block" {
   description = "CIDR block of the GCP VPC you want to peer with (e.g. 10.0.0.0/16)."
   type        = string

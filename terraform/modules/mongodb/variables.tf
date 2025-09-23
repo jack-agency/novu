@@ -26,6 +26,16 @@ variable "provider_name" {
   default     = "GCP"
 }
 
+variable "backing_provider_name" {
+  description = "Backing cloud provider for the Atlas cluster"
+  type        = string
+}
+
+variable "network_container_id" {
+  description = "ID of an existing Atlas network container (VPC) to use for peering. If not provided, a new container will be created using the provided atlas_cidr_block."
+  type        = string
+}
+
 variable "atlas_region" {
   description = "Provider region (Atlas region name), e.g. europe-west1 for Belgium"
   type        = string
@@ -35,11 +45,6 @@ variable "atlas_region" {
 
 variable "instance_size" {
   description = "Atlas instance size (cluster tier), e.g. M10"
-  type        = string
-}
-
-variable "max_instance_size" {
-  description = "Maximum instance size for auto-scaling (if enabled)"
   type        = string
 }
 

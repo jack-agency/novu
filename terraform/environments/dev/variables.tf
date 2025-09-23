@@ -210,12 +210,6 @@ variable "mongodb_url_secret_id" {
   default     = "novu-mongodb-url"
 }
 
-variable "mongodb_url" {
-  description = "The MongoDB connection string"
-  type        = string
-  sensitive   = true
-}
-
 variable "redis_url_secret_id" {
   description = "The name of the Redis connection string secret"
   type        = string
@@ -298,19 +292,25 @@ variable "mongo_version" {
 variable "provider_name" {
   description = "Cloud provider for the Atlas cluster"
   type        = string
+  default     = "TENANT"
+}
+
+variable "backing_provider_name" {
+  description = "Backing cloud provider for the Atlas cluster"
+  type        = string
   default     = "GCP"
+}
+
+variable "network_container_id" {
+  description = "ID of an existing Atlas network container (VPC) to use for peering. If not provided, a new container will be created using the provided atlas_cidr_block."
+  type        = string
+  default     = "67c192987ffea50c16eec17c"
 }
 
 variable "instance_size" {
   description = "Atlas instance size (cluster tier), e.g. M10"
   type        = string
-  default     = "M10"
-}
-
-variable "max_instance_size" {
-  description = "Maximum instance size for auto-scaling (if enabled)"
-  type        = string
-  default     = "M20"
+  default     = "M0"
 }
 
 variable "atlas_cidr_block" {
@@ -338,16 +338,6 @@ variable "gcp_vpc_name" {
   type        = string
 }
 
-variable "ip_access_list" {
-  description = "A map of comments to CIDR blocks to add to the IP access list."
-  type        = map(string)
-  default = {
-    "VPC Peering Access"                     = "10.0.0.0/16" # Example CIDR for your VPC
-    "Serverless VPC Access Connector Subnet" = "10.7.0.0/28" # Example CIDR for serverless connector
-    "Office IP for Compass Access"           = "YOUR_OFFICE_IP/32" # Replace with your actual office IP
-  }
-}
-
 variable "db_username" {
   description = "The username for the database user."
   type        = string
@@ -361,7 +351,7 @@ variable "db_password" {
 }
 
 variable "environment" {
-  description = "Environment tag to apply to resources (e.g. dev, staging, prod)"
+  description = "Environment tag to apply to resources"
   type        = string
   default     = "development"
 }
