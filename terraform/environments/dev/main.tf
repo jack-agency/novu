@@ -67,7 +67,7 @@ module "secrets" {
   source                         = "../../modules/secrets"
   project_id                     = var.project_id
   mongodb_url_secret_id          = "novu-mongodb-url"
-  mongodb_url                    = module.mongodb.connection_string
+  mongodb_url                    = module.mongodb.free_tier_connection_string
   redis_host_secret_id           = "novu-redis-host"
   redis_host                     = module.redis.redis_host
   redis_password_secret_id       = "novu-redis-password"
