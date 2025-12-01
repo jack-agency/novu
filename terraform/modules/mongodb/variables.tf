@@ -68,6 +68,17 @@ variable "gcp_vpc_name" {
   type        = string
 }
 
+variable "gcp_shared_vpc_name" {
+  description = "Name of the shared VPC in the host network project."
+  type = string
+}
+
+variable "vpc_host_project_id" {
+    description = "The project ID of the VPC host (for Shared VPC). Defaults to project_id if not specified."
+    type        = string
+    default     = "network-project-id"  # Replace with your default project ID or leave as null
+}
+
 variable "db_username" {
   description = "The username for the database user."
   type        = string

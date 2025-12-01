@@ -10,21 +10,21 @@ resource "mongodbatlas_network_peering" "gcp_peering" {
   project_id       = var.atlas_project_id
   container_id     = one(values(mongodbatlas_advanced_cluster.novu_cluster.replication_specs[0].container_id)) != null ? one(values(mongodbatlas_advanced_cluster.novu_cluster.replication_specs[0].container_id)) : var.network_container_id
   provider_name    = "GCP"
-  network_name     = var.gcp_vpc_name
+  network_name     = var.gcp_shared_vpc_name
   atlas_cidr_block = var.atlas_cidr_block
-  gcp_project_id   = var.gcp_project_id
+  gcp_project_id   = var.vpc_host_project_id
 }
 
 # GCP VPC
-data "google_compute_network" "lucius_vpc" {
-  project = var.gcp_project_id
-  name    = var.gcp_vpc_name
+data "google_compute_network" "vpc" {
+  project = var.vpc_host_project_id
+  name    = var.gcp_shared_vpc_name
 }
 
 # GCP Peer
 resource "google_compute_network_peering" "gcp_peer" {
   name         = "gcp-peer-${var.cluster_name}"
-  network     = data.google_compute_network.lucius_vpc.self_link
+  network     = data.google_compute_network.vpc.self_link
   peer_network = "https://www.googleapis.com/compute/v1/projects/${mongodbatlas_network_peering.gcp_peering.atlas_gcp_project_id}/global/networks/${mongodbatlas_network_peering.gcp_peering.atlas_vpc_name}"
 }
 

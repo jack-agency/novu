@@ -9,6 +9,11 @@ variable "region" {
   default     = "europe-west1"
 }
 
+variable "bridge_service_name" {
+  description = "The name of the Cloud Run service for the Novu Bridge"
+  type        = string
+}
+
 variable "bridge_image" {
   description = "The fully qualified image URL to deploy from Artifact Registry"
   type        = string

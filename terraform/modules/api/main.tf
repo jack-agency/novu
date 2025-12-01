@@ -185,4 +185,17 @@ resource "google_cloud_run_v2_service_iam_policy" "allow_unauthenticated" {
   project     = var.project_id
 }
 
-# Min instance 1??
+# Adding NEG for Load Balancer integration.
+resource "google_compute_region_network_endpoint_group" "novu_api_neg" {
+  name        = "${var.api_service_name}-neg"
+  region    = var.region
+  project     = var.project_id
+  network_endpoint_type = "SERVERLESS"
+  cloud_run {
+    service = google_cloud_run_v2_service.novu_api.name
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [ google_cloud_run_v2_service.novu_api ]
+}

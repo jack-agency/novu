@@ -328,6 +328,11 @@ variable "serverless_connector_cidr_block" {
   type        = string
 }
 
+variable "shared_vpc_serverless_connector_cidr_block" {
+  description = "CIDR block of the Shared VPC Serverless VPC Access Connector subnet (e.g. 10.7.0.0/28)."
+  type        = string
+}
+
 variable "gcp_project_id" {
   description = "GCP project id that owns the VPC you want to peer with."
   type        = string
@@ -336,6 +341,16 @@ variable "gcp_project_id" {
 variable "gcp_vpc_name" {
   description = "Name of the GCP VPC network to peer with."
   type        = string
+}
+
+variable "gcp_shared_vpc_name" {
+  description = "Name of the Shared VPC in the host network project."
+}
+
+variable "vpc_host_project_id" {
+  description = "The project ID of the Shared VPC host (leave empty for non-shared VPC)"
+  type        = string
+  default     = null
 }
 
 variable "db_username" {

@@ -48,3 +48,18 @@ resource "google_cloud_run_v2_service_iam_policy" "allow_unauthenticated" {
   policy_data   = data.google_iam_policy.public_iam_policy.policy_data
   project = var.project_id
 }
+
+# Adding NEG for Load Balancer integration.
+resource "google_compute_region_network_endpoint_group" "novu_bridge_neg" {
+  name        = "${var.bridge_service_name}-neg"
+  region    = var.region
+  project     = var.project_id
+  network_endpoint_type = "SERVERLESS"
+  cloud_run {
+    service = google_cloud_run_v2_service.novu_bridge.name
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [ google_cloud_run_v2_service.novu_bridge ]
+}

@@ -222,6 +222,7 @@ module "bridge" {
   source        = "../../modules/bridge"
   project_id    = var.project_id
   region        = var.region
+  bridge_service_name = var.bridge_service_name
   bridge_image  = data.google_artifact_registry_docker_image.novu_bridge.self_link
   novu_cloudrun_service_account = module.service_account.novu_cloudrun_sa_email
   vpc_connector = var.vpc_connector
@@ -234,7 +235,8 @@ module "bridge" {
 module "mongodb" {
   source     = "../../modules/mongodb"
   atlas_project_id = var.atlas_project_id
-  gcp_project_id = var.gcp_project_id
+  gcp_project_id = var.vpc_host_project_id
+  gcp_shared_vpc_name = var.gcp_shared_vpc_name
   instance_size = var.instance_size
   provider_name = var.provider_name
   network_container_id = var.network_container_id
@@ -242,8 +244,8 @@ module "mongodb" {
   private_key = var.private_key
   public_key  = var.public_key
   gcp_cidr_block = var.gcp_cidr_block
-  serverless_connector_cidr_block = var.serverless_connector_cidr_block
-  gcp_vpc_name = var.gcp_vpc_name
+  serverless_connector_cidr_block = var.shared_vpc_serverless_connector_cidr_block
+  gcp_vpc_name = var.gcp_shared_vpc_name
   db_username = var.db_username
   db_password = var.db_password
   environment = var.environment

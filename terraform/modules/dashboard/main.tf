@@ -58,3 +58,18 @@ resource "google_cloud_run_v2_service_iam_member" "iap_invoker" {
   role   = "roles/run.invoker"
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-iap.iam.gserviceaccount.com"
 }
+
+# Adding NEG for Load Balancer integration.
+resource "google_compute_region_network_endpoint_group" "novu_dashboard_neg" {
+  name        = "${var.dashboard_service_name}-neg"
+  region    = var.region
+  project     = var.project_id
+  network_endpoint_type = "SERVERLESS"
+  cloud_run {
+    service = google_cloud_run_v2_service.novu_dashboard.name
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [ google_cloud_run_v2_service.novu_dashboard ]
+}
