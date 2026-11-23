@@ -21,7 +21,7 @@
     "@novu/shared": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
-    "i18next": "^23.7.11",
+    "i18next": "^26.3.4",
     "multer": "^2.0.0",
     "shortid": "^2.2.16"
   },
